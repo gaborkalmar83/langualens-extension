@@ -8,6 +8,7 @@ const DEFAULTS = {
   hide: false,
   autoLookup: true,
   autoTranslate: false,
+  autoReverse: true,
   hint: 'tap to reveal'
 };
 

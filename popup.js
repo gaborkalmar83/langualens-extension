@@ -7,6 +7,7 @@ const DEFAULTS = {
   hide: false,
   autoLookup: true,
   autoTranslate: false,
+  autoReverse: true,
   hint: 'tap to reveal'
 };
 
@@ -50,14 +51,21 @@ async function refreshStatus() {
     return;
   }
 
-  const state = await self.LLTranslator.availability(settings.source, settings.target);
-  if (state === 'available') {
+  /* With the flip enabled both directions get used, so both are reported. */
+  const states = [await self.LLTranslator.availability(settings.source, settings.target)];
+  if (settings.autoReverse && settings.source !== settings.target) {
+    states.push(await self.LLTranslator.availability(settings.target, settings.source));
+  }
+
+  if (states.every((s) => s === 'available')) {
     status.textContent = 'Model ready. Translation runs on this device.';
     download.classList.add('hidden');
-  } else if (state === 'downloadable') {
-    status.textContent = 'Model not downloaded yet. Downloads once, then works offline.';
+  } else if (states.some((s) => s === 'downloadable')) {
+    status.textContent = states.length > 1
+      ? 'A model is still missing. Both directions are used, so both download once.'
+      : 'Model not downloaded yet. Downloads once, then works offline.';
     download.classList.remove('hidden');
-  } else if (state === 'downloading') {
+  } else if (states.some((s) => s === 'downloading')) {
     status.textContent = 'Downloading model…';
     download.classList.add('hidden');
   } else {
@@ -107,6 +115,7 @@ async function init() {
   $('hide').checked = settings.hide;
   $('autoLookup').checked = settings.autoLookup;
   $('autoTranslate').checked = settings.autoTranslate;
+  $('autoReverse').checked = settings.autoReverse;
 
   await refreshStatus();
   await loadSaved();
@@ -132,6 +141,7 @@ async function init() {
   $('hide').addEventListener('change', (e) => save({ hide: e.target.checked }));
   $('autoLookup').addEventListener('change', (e) => save({ autoLookup: e.target.checked }));
   $('autoTranslate').addEventListener('change', (e) => save({ autoTranslate: e.target.checked }));
+  $('autoReverse').addEventListener('change', (e) => save({ autoReverse: e.target.checked }));
 
   /* Chrome wants a user gesture before it will fetch a model, which is exactly
    * what this button is. */
@@ -141,6 +151,12 @@ async function init() {
       await self.LLTranslator.prepare(settings.source, settings.target, (loaded) => {
         $('status').textContent = `Downloading model… ${Math.round(loaded * 100)}%`;
       });
+      if (settings.autoReverse && settings.source !== settings.target) {
+        await self.LLTranslator.prepare(settings.target, settings.source, (loaded) => {
+          $('status').textContent =
+            `Downloading the other direction… ${Math.round(loaded * 100)}%`;
+        });
+      }
       $('status').textContent = 'Model ready. Translation runs on this device.';
       $('download').classList.add('hidden');
     } catch (e) {

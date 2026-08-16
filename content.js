@@ -29,6 +29,7 @@
     hide: false,
     autoLookup: true,
     autoTranslate: false,
+    autoReverse: true,
     hint: 'tap to reveal'
   };
 
@@ -113,6 +114,74 @@
     setTimeout(function () { pop.style.display = 'none'; }, 320);
   });
 
+  /* -------------------------- direction -------------------------- */
+  /* If you are learning Dutch with English as your target, an English page is
+   * the one you want turned into Dutch, not left alone. So when the page is
+   * already written in the target language the pair is flipped for that page.
+   * Controlled by the autoReverse setting, on by default. */
+
+  var activeDir = null;   /* { source, target, reversed } for this page */
+  var dirPromise = null;
+
+  function baseTag(tag) {
+    return String(tag || '').toLowerCase().split(/[-_]/)[0];
+  }
+
+  function pageSample() {
+    var text = (document.body && document.body.innerText) || '';
+    return text.trim().slice(0, 1200);
+  }
+
+  /** The page's own declaration first; Chrome's detector only as a fallback. */
+  async function detectLanguage() {
+    var declared = baseTag(document.documentElement.getAttribute('lang'));
+    if (declared) { return declared; }
+
+    if (typeof self.LanguageDetector === 'undefined') { return null; }
+    var sample = pageSample();
+    if (sample.length < 40) { return null; }
+    try {
+      if (await self.LanguageDetector.availability() === 'unavailable') { return null; }
+      var detector = await self.LanguageDetector.create();
+      var results = await detector.detect(sample);
+      if (results && results.length && results[0].confidence >= 0.5) {
+        return baseTag(results[0].detectedLanguage);
+      }
+    } catch (e) { /* fall through */ }
+    return null;
+  }
+
+  function direction() {
+    if (activeDir) { return Promise.resolve(activeDir); }
+    if (dirPromise) { return dirPromise; }
+
+    dirPromise = (async function () {
+      var source = settings.source;
+      var target = settings.target;
+      var reversed = false;
+
+      if (settings.autoReverse && baseTag(source) !== baseTag(target)) {
+        var lang = await detectLanguage();
+        if (lang && lang === baseTag(target)) {
+          source = settings.target;
+          target = settings.source;
+          reversed = true;
+        }
+      }
+
+      activeDir = { source: source, target: target, reversed: reversed };
+      return activeDir;
+    })();
+
+    return dirPromise;
+  }
+
+  /** Called when the pair or the toggle changes, so the page is judged again. */
+  function resetDirection() {
+    activeDir = null;
+    dirPromise = null;
+  }
+
   /* ------------------------ selection actions ------------------------ */
   function selectedText() {
     var s = window.getSelection();
@@ -135,7 +204,8 @@
       toast('This Chrome has no built-in translator. See the extension popup.');
       return;
     }
-    var out = await self.LLTranslator.translate(text, settings.source, settings.target);
+    var dir = await direction();
+    var out = await self.LLTranslator.translate(text, dir.source, dir.target);
     showPopup(out || 'No translation. Open the LanguaLens popup and download the model.');
   }
 
@@ -181,9 +251,8 @@
   });
 
   async function save(text) {
-    var translation = await self.LLTranslator.translate(
-      text, settings.source, settings.target
-    );
+    var dir = await direction();
+    var translation = await self.LLTranslator.translate(text, dir.source, dir.target);
     chrome_.runtime.sendMessage({
       type: 'll-save',
       item: {
@@ -191,8 +260,8 @@
         translation: translation,
         context: contextFor(),
         origin: document.title + ' | ' + location.href,
-        source: settings.source,
-        target: settings.target
+        source: dir.source,
+        target: dir.target
       }
     }, function (reply) {
       toast(reply && reply.saved ? 'Saved: ' + text : 'Already saved');
@@ -203,7 +272,7 @@
     try {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
-      u.lang = settings.source;
+      u.lang = activeDir ? activeDir.source : settings.source;
       window.speechSynthesis.speak(u);
     } catch (e) {
       toast('Speech is not available here');
@@ -338,14 +407,15 @@
 
   /* ---------------------------- running ---------------------------- */
   async function flush() {
+    var dir = await direction();
     while (queue.length) {
       var batch = queue.splice(0, 8);
       total += batch.length;
       /* eslint-disable no-await-in-loop */
       var results = await self.LLTranslator.translateAll(
         batch.map(function (b) { return b.text; }),
-        settings.source,
-        settings.target
+        dir.source,
+        dir.target
       );
       batch.forEach(function (item, i) {
         item.node.textContent = results[i] || '';
@@ -364,14 +434,25 @@
       toast('This Chrome has no built-in translator. See the extension popup.');
       return;
     }
-    var state = await self.LLTranslator.availability(settings.source, settings.target);
+    var dir = await direction();
+    var state = await self.LLTranslator.availability(dir.source, dir.target);
     if (state === 'unavailable') {
       toast('This language pair is not available in Chrome.');
       return;
     }
     if (state === 'downloadable') {
-      toast('Open the LanguaLens popup and download the model first.');
+      toast(
+        'Open the LanguaLens popup and download the ' +
+        self.LLLanguages.nameOf(dir.source) + ' to ' +
+        self.LLLanguages.nameOf(dir.target) + ' model first.'
+      );
       return;
+    }
+    if (dir.reversed) {
+      toast(
+        'This page is in ' + self.LLLanguages.nameOf(dir.source) +
+        ', translating into ' + self.LLLanguages.nameOf(dir.target) + '.'
+      );
     }
 
     running = true;
@@ -418,9 +499,13 @@
   /* --------------------------- messaging --------------------------- */
   function applySettings(next) {
     if (!next) { return; }
+    var before = settings.source + '>' + settings.target + '|' + settings.autoReverse;
     Object.keys(next).forEach(function (k) {
       if (k in settings) { settings[k] = next[k]; }
     });
+    if (before !== settings.source + '>' + settings.target + '|' + settings.autoReverse) {
+      resetDirection();
+    }
   }
 
   chrome_.storage.local.get('settings', function (data) {
