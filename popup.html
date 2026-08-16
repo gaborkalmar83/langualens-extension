@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LanguaLens</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>LanguaLens</h1>
+
+  <div class="row">
+    <label class="field">
+      <span>From</span>
+      <select id="source"></select>
+    </label>
+    <button id="swap" class="ghost" title="Swap">&#8646;</button>
+    <label class="field">
+      <span>To</span>
+      <select id="target"></select>
+    </label>
+  </div>
+
+  <p id="status" class="status"></p>
+
+  <button id="download" class="secondary hidden">Download model</button>
+  <button id="run" class="primary">Translate this page</button>
+
+  <div class="toggles">
+    <label><input type="checkbox" id="mode"> Translate per sentence (off = per paragraph)</label>
+    <label><input type="checkbox" id="hide"> Hide translation until clicked</label>
+    <label><input type="checkbox" id="autoLookup"> Translate selected text automatically</label>
+    <label><input type="checkbox" id="autoTranslate"> Translate every page as it opens</label>
+  </div>
+
+  <hr>
+
+  <div class="row spread">
+    <span id="savedCount">0 saved</span>
+    <span>
+      <a id="export" class="link" download="langualens.tsv">Export for Anki</a>
+      <button id="clear" class="ghost small">Clear</button>
+    </span>
+  </div>
+
+  <ul id="savedList"></ul>
+
+  <hr>
+
+  <details>
+    <summary>Where your text goes</summary>
+    <p>
+      Translation runs on your own machine using Chrome's built-in translator.
+      The text you select and the pages you read are never sent to a translation
+      server, and there are no accounts, analytics or advertising.
+    </p>
+    <p>
+      Two things use the network: Chrome downloading a language model once per
+      language pair, which transfers the model and not your text; and speaking
+      text aloud, which hands it to the speech voice you have installed, and some
+      voices are cloud based.
+    </p>
+    <p>
+      Saved words stay in this browser's local extension storage until you export
+      or clear them.
+    </p>
+  </details>
+
+  <script src="languages.js"></script>
+  <script src="translator.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
