@@ -27,10 +27,23 @@
 
   <div class="toggles">
     <label><input type="checkbox" id="mode"> Translate per sentence (off = per paragraph)</label>
+    <label><input type="checkbox" id="translationFirst"> Show the translation first, original underneath</label>
     <label><input type="checkbox" id="hide"> Hide translation until clicked</label>
     <label><input type="checkbox" id="autoLookup"> Translate selected text automatically</label>
     <label><input type="checkbox" id="autoTranslate"> Translate every page as it opens</label>
+    <label><input type="checkbox" id="autoDetectSource"> Detect the page language instead of using From</label>
     <label><input type="checkbox" id="autoReverse"> Flip the direction on pages already in the To language</label>
+  </div>
+
+  <hr>
+
+  <div class="sites">
+    <span class="label">Never translate</span>
+    <label class="siteToggle">
+      <input type="checkbox" id="excludeSite">
+      <span id="siteName">this site</span>
+    </label>
+    <ul id="excludedList" class="excluded"></ul>
   </div>
 
   <hr>

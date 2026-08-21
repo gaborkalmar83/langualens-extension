@@ -30,6 +30,22 @@ translate button is still there for selections over 400 characters, which are sk
 by the automatic pass because they do not fit in a popup, and for bringing a popup
 back after it has faded.
 
+**Original first or translation first.** By default the original leads and the
+translation sits underneath. Flip it in the popup if you would rather read the
+translation and check the original.
+
+**Automatic language detection, on by default.** Rather than trusting the From
+setting, LanguaLens detects what the page is actually written in and translates from
+that, so you do not have to change the pair when you move between sites. It prefers
+Chrome's on-device detector over the page's `lang` attribute, since plenty of sites
+declare `lang="en"` and then serve something else, and falls back to the declaration
+when the detector is unavailable or unsure. Turn it off to always translate from the
+From language.
+
+**Per-site exclusions.** Add any site to a never-translate list from the popup and
+LanguaLens stays completely inert there: no page pass, no selection bar, no popup.
+Excluding `example.com` also covers its subdomains.
+
 **Direction flips on pages already in your target language.** If you are learning
 Dutch and read with *From: Dutch, To: English*, an English page is the one you want
 turned into Dutch. LanguaLens detects this from the page's own `lang` attribute,
@@ -40,6 +56,9 @@ page, telling you it did. It is a checkbox, on by default.
 from, and export as a tab separated file that Anki imports directly.
 
 **Adjustable translation colour.** Five presets plus any custom colour, in the popup.
+Which of a preset's two values applies is decided by measuring the page's own
+background rather than by your OS theme, because a light page read on a dark-themed
+system otherwise gets the dark-mode colour and the contrast collapses.
 Each preset carries a separate value for light and dark pages, since a colour that
 reads well on white rarely reads well on black; the swatch shows both halves. The
 preset hues come from the Okabe-Ito palette, which stays distinguishable from ordinary

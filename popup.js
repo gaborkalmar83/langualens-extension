@@ -8,6 +8,9 @@ const DEFAULTS = {
   autoLookup: true,
   autoTranslate: false,
   autoReverse: true,
+  autoDetectSource: true,
+  translationFirst: false,
+  excluded: [],
   colorPreset: 'blue',
   colorLight: '',
   colorDark: '',
@@ -145,6 +148,54 @@ function renderSwatches() {
     settings.colorPreset === 'custom' ? '2px solid var(--fg)' : 'none';
 }
 
+
+let currentHost = '';
+
+/* The host comes from the page itself when a content script is there, and from
+ * the tab URL otherwise, so the control still works on a page that has not
+ * been injected. */
+async function currentSite() {
+  const tab = await activeTab();
+  if (!tab) { return ''; }
+  try {
+    const reply = await chrome.tabs.sendMessage(tab.id, { type: 'll-site' });
+    if (reply && reply.host) { return reply.host; }
+  } catch (e) { /* no content script here */ }
+  try {
+    return new URL(tab.url).hostname.replace(/^www\./, '');
+  } catch (e) {
+    return '';
+  }
+}
+
+async function renderSites() {
+  currentHost = await currentSite();
+  const excluded = settings.excluded || [];
+
+  $('siteName').textContent = currentHost || 'this site';
+  $('excludeSite').checked = excluded.includes(currentHost);
+  $('excludeSite').disabled = !currentHost;
+
+  const list = $('excludedList');
+  list.innerHTML = '';
+  excluded.slice().sort().forEach((host) => {
+    const li = document.createElement('li');
+    li.textContent = host;
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'ghost small';
+    remove.textContent = '×';
+    remove.title = `Stop excluding ${host}`;
+    remove.setAttribute('aria-label', `Stop excluding ${host}`);
+    remove.addEventListener('click', async () => {
+      await save({ excluded: excluded.filter((h) => h !== host) });
+      await renderSites();
+    });
+    li.appendChild(remove);
+    list.appendChild(li);
+  });
+}
+
 async function init() {
   const data = await chrome.storage.local.get('settings');
   settings = { ...DEFAULTS, ...(data.settings || {}) };
@@ -156,8 +207,11 @@ async function init() {
   $('autoLookup').checked = settings.autoLookup;
   $('autoTranslate').checked = settings.autoTranslate;
   $('autoReverse').checked = settings.autoReverse;
+  $('autoDetectSource').checked = settings.autoDetectSource;
+  $('translationFirst').checked = settings.translationFirst;
 
   renderSwatches();
+  await renderSites();
 
   await refreshStatus();
   await loadSaved();
@@ -184,6 +238,21 @@ async function init() {
   $('autoLookup').addEventListener('change', (e) => save({ autoLookup: e.target.checked }));
   $('autoTranslate').addEventListener('change', (e) => save({ autoTranslate: e.target.checked }));
   $('autoReverse').addEventListener('change', (e) => save({ autoReverse: e.target.checked }));
+  $('autoDetectSource').addEventListener('change', (e) =>
+    save({ autoDetectSource: e.target.checked }));
+  $('translationFirst').addEventListener('change', async (e) => {
+    await save({ translationFirst: e.target.checked });
+    $('status').textContent = 'Reload the page to rearrange existing translations.';
+  });
+
+  $('excludeSite').addEventListener('change', async (e) => {
+    const host = currentHost;
+    if (!host) { return; }
+    const list = (settings.excluded || []).filter((h) => h !== host);
+    if (e.target.checked) { list.push(host); }
+    await save({ excluded: list });
+    await renderSites();
+  });
 
   /* A custom colour is applied to both themes; the user sees it on whichever
    * one they are actually reading in. */

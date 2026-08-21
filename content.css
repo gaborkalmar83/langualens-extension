@@ -22,6 +22,10 @@
   font-weight: 400;
 }
 
+/* When the translation comes first it needs its breathing room below it
+   instead of above, or it collides with the original line. */
+.ll-tr.ll-first { margin: 0 0 6px 0; }
+
 .ll-tr:empty { display: none !important; }
 
 .ll-tr.ll-veil {
@@ -42,6 +46,11 @@
 .ll-tr.ll-veil.ll-open { color: var(--ll-tr-color) !important; background: transparent; }
 .ll-tr.ll-veil.ll-open::after { content: ""; }
 
+/* Which of the two colours applies is decided by the page's own background,
+   not by the OS theme: a light page read on a dark-themed system still needs
+   the dark-on-light colour or the contrast collapses. The content script
+   measures the background and stamps data-ll-scheme on the root element. The
+   media query below is only the fallback for before that has happened. */
 @media (prefers-color-scheme: dark) {
   .ll-tr {
     color: var(--ll-tr-color-dark) !important;
@@ -53,6 +62,26 @@
   .ll-tr.ll-veil.ll-open { color: var(--ll-tr-color-dark) !important; }
   .ll-tr.ll-veil::after { color: var(--ll-tr-color-dark); }
 }
+
+:root[data-ll-scheme="light"] .ll-tr {
+  color: var(--ll-tr-color) !important;
+  border-left-color: color-mix(in srgb, var(--ll-tr-color) 35%, transparent);
+}
+:root[data-ll-scheme="light"] .ll-tr.ll-veil {
+  background: color-mix(in srgb, var(--ll-tr-color) 13%, transparent);
+}
+:root[data-ll-scheme="light"] .ll-tr.ll-veil.ll-open { color: var(--ll-tr-color) !important; }
+:root[data-ll-scheme="light"] .ll-tr.ll-veil::after { color: var(--ll-tr-color); }
+
+:root[data-ll-scheme="dark"] .ll-tr {
+  color: var(--ll-tr-color-dark) !important;
+  border-left-color: color-mix(in srgb, var(--ll-tr-color-dark) 40%, transparent);
+}
+:root[data-ll-scheme="dark"] .ll-tr.ll-veil {
+  background: color-mix(in srgb, var(--ll-tr-color-dark) 16%, transparent);
+}
+:root[data-ll-scheme="dark"] .ll-tr.ll-veil.ll-open { color: var(--ll-tr-color-dark) !important; }
+:root[data-ll-scheme="dark"] .ll-tr.ll-veil::after { color: var(--ll-tr-color-dark); }
 
 #ll-bar {
   position: fixed;

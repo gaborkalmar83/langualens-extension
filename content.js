@@ -30,6 +30,9 @@
     autoLookup: true,
     autoTranslate: false,
     autoReverse: true,
+    autoDetectSource: true,
+    translationFirst: false,
+    excluded: [],
     colorPreset: 'blue',
     colorLight: '',
     colorDark: '',
@@ -117,6 +120,18 @@
     setTimeout(function () { pop.style.display = 'none'; }, 320);
   });
 
+  /* -------------------------- exclusions -------------------------- */
+  /* A host is excluded if it matches exactly or is a subdomain of an entry,
+   * so "example.com" also covers "news.example.com". */
+  function isExcluded() {
+    var host = location.hostname.toLowerCase().replace(/^www\./, '');
+    return (settings.excluded || []).some(function (entry) {
+      var e = String(entry || '').toLowerCase().replace(/^www\./, '').trim();
+      if (!e) { return false; }
+      return host === e || host.endsWith('.' + e);
+    });
+  }
+
   /* -------------------------- direction -------------------------- */
   /* If you are learning Dutch with English as your target, an English page is
    * the one you want turned into Dutch, not left alone. So when the page is
@@ -135,23 +150,42 @@
     return text.trim().slice(0, 1200);
   }
 
-  /** The page's own declaration first; Chrome's detector only as a fallback. */
+  /** Resolves to fallback if the promise has not settled in time. */
+  function withTimeout(promise, ms, fallback) {
+    return Promise.race([
+      promise,
+      new Promise(function (resolve) { setTimeout(function () { resolve(fallback); }, ms); })
+    ]);
+  }
+
+  /* Chrome's detector is preferred over the page's lang attribute, because
+   * plenty of sites declare lang="en" and then serve something else. The
+   * declaration is the fallback when the detector is missing or unsure.
+   * Everything is time-boxed: these APIs have been seen not to settle. */
   async function detectLanguage() {
     var declared = baseTag(document.documentElement.getAttribute('lang'));
-    if (declared) { return declared; }
-
-    if (typeof self.LanguageDetector === 'undefined') { return null; }
     var sample = pageSample();
-    if (sample.length < 40) { return null; }
-    try {
-      if (await self.LanguageDetector.availability() === 'unavailable') { return null; }
-      var detector = await self.LanguageDetector.create();
-      var results = await detector.detect(sample);
-      if (results && results.length && results[0].confidence >= 0.5) {
-        return baseTag(results[0].detectedLanguage);
-      }
-    } catch (e) { /* fall through */ }
-    return null;
+
+    if (typeof self.LanguageDetector !== 'undefined' && sample.length >= 40) {
+      try {
+        var state = await withTimeout(self.LanguageDetector.availability(), 4000, 'unknown');
+        if (state !== 'unavailable') {
+          var detector = await withTimeout(self.LanguageDetector.create(), 8000, null);
+          if (detector) {
+            var results = await withTimeout(detector.detect(sample), 4000, null);
+            if (results && results.length && results[0].confidence >= 0.5) {
+              return baseTag(results[0].detectedLanguage);
+            }
+          }
+        }
+      } catch (e) { /* fall through to the declaration */ }
+    }
+
+    return declared || null;
+  }
+
+  function isSupported(tag) {
+    return self.LLLanguages.ALL.some(function (l) { return l.tag === tag; });
   }
 
   function direction() {
@@ -162,17 +196,34 @@
       var source = settings.source;
       var target = settings.target;
       var reversed = false;
+      var detected = null;
 
-      if (settings.autoReverse && baseTag(source) !== baseTag(target)) {
-        var lang = await detectLanguage();
-        if (lang && lang === baseTag(target)) {
+      var needLang = settings.autoDetectSource ||
+        (settings.autoReverse && baseTag(source) !== baseTag(target));
+      if (needLang) { detected = await detectLanguage(); }
+
+      if (detected && detected === baseTag(target)) {
+        /* The page is already in the language being translated into. Flipping
+         * is the only reading of that which is any use. */
+        if (settings.autoReverse && baseTag(source) !== baseTag(target)) {
           source = settings.target;
           target = settings.source;
           reversed = true;
         }
+      } else if (settings.autoDetectSource && detected && isSupported(detected)) {
+        /* Read whatever the page is actually written in, rather than insisting
+         * on the From setting. */
+        source = detected;
       }
 
-      activeDir = { source: source, target: target, reversed: reversed };
+      activeDir = {
+        source: source,
+        target: target,
+        reversed: reversed,
+        detected: detected,
+        wasDetected: source !== settings.target && detected === source &&
+          baseTag(source) !== baseTag(settings.source)
+      };
       return activeDir;
     })();
 
@@ -202,7 +253,7 @@
   }
 
   async function lookup(text) {
-    if (!text) { return; }
+    if (!text || isExcluded()) { return; }
     if (!self.LLTranslator.supported()) {
       toast('This Chrome has no built-in translator. See the extension popup.');
       return;
@@ -216,6 +267,7 @@
   var selTimer = null;
 
   document.addEventListener('selectionchange', function () {
+    if (isExcluded()) { bar.style.display = 'none'; return; }
     var text = selectedText();
     bar.style.display = text.length > 0 ? 'flex' : 'none';
 
@@ -359,7 +411,12 @@
 
   function appendBlockTranslation(el, text) {
     var slot = makeSlot();
-    el.appendChild(slot);
+    if (settings.translationFirst) {
+      slot.classList.add('ll-first');
+      el.insertBefore(slot, el.firstChild);
+    } else {
+      el.appendChild(slot);
+    }
     queue.push({ node: slot, text: text });
   }
 
@@ -378,12 +435,18 @@
       var host = document.createElement('span');
       host.className = 'll-src';
       host.appendChild(document.createTextNode(piece));
-      frag.appendChild(host);
-      if (trimmed.length >= 12 && hasLetters(trimmed)) {
-        var slot = makeSlot();
+
+      var wanted = trimmed.length >= 12 && hasLetters(trimmed);
+      var slot = wanted ? makeSlot() : null;
+      if (slot && settings.translationFirst) {
+        slot.classList.add('ll-first');
         frag.appendChild(slot);
-        slots.push({ node: slot, text: trimmed });
+        frag.appendChild(host);
+      } else {
+        frag.appendChild(host);
+        if (slot) { frag.appendChild(slot); }
       }
+      if (slot) { slots.push({ node: slot, text: trimmed }); }
     }
     el.innerHTML = '';
     el.appendChild(frag);
@@ -433,6 +496,10 @@
 
   async function run() {
     if (running) { return; }
+    if (isExcluded()) {
+      toast('LanguaLens is turned off for ' + location.hostname + '.');
+      return;
+    }
     if (!self.LLTranslator.supported()) {
       toast('This Chrome has no built-in translator. See the extension popup.');
       return;
@@ -452,7 +519,7 @@
       );
       return;
     }
-    if (dir.reversed) {
+    if (dir.reversed || dir.wasDetected) {
       toast(
         'This page is in ' + self.LLLanguages.nameOf(dir.source) +
         ', translating into ' + self.LLLanguages.nameOf(dir.target) + '.'
@@ -460,6 +527,7 @@
     }
 
     running = true;
+    applyColors();
     mount();
     progress.style.opacity = '1';
     progress.style.width = '0';
@@ -508,15 +576,60 @@
     var root = document.documentElement;
     root.style.setProperty('--ll-tr-color', c.light);
     root.style.setProperty('--ll-tr-color-dark', c.dark);
+    root.setAttribute('data-ll-scheme', pageIsDark() ? 'dark' : 'light');
+  }
+
+  /* The first painted background found walking up from the body. Pages very
+   * often sit on a white background while the reader's OS is in dark mode, and
+   * picking the colour from the OS in that case destroys the contrast. */
+  function pageIsDark() {
+    var el = document.body || document.documentElement;
+    var found = null;
+
+    while (el) {
+      var bg = window.getComputedStyle(el).backgroundColor;
+      if (bg && bg !== 'transparent') {
+        var parts = bg.match(/[\d.]+/g);
+        /* Skip fully transparent backgrounds; they show whatever is behind. */
+        if (parts && parts.length >= 3 && (parts.length < 4 || parseFloat(parts[3]) > 0.1)) {
+          found = parts;
+          break;
+        }
+      }
+      el = el.parentElement;
+    }
+
+    if (!found) {
+      return window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    return relativeLuminance(found) < LIGHT_TEXT_BELOW;
+  }
+
+  /* WCAG relative luminance, and the threshold it defines for choosing between
+   * dark and light foregrounds. The naive channel average gets saturated
+   * backgrounds wrong - a red page comes out "dark" and then gets a light
+   * accent that is unreadable on it. */
+  var LIGHT_TEXT_BELOW = 0.179;
+
+  function relativeLuminance(parts) {
+    var channel = [0, 1, 2].map(function (i) {
+      var v = parseFloat(parts[i]) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * channel[0] + 0.7152 * channel[1] + 0.0722 * channel[2];
   }
 
   function applySettings(next) {
     if (!next) { return; }
-    var before = settings.source + '>' + settings.target + '|' + settings.autoReverse;
+    var before = settings.source + '>' + settings.target + '|' + settings.autoReverse +
+      '|' + settings.autoDetectSource;
     Object.keys(next).forEach(function (k) {
       if (k in settings) { settings[k] = next[k]; }
     });
-    if (before !== settings.source + '>' + settings.target + '|' + settings.autoReverse) {
+    if (before !== settings.source + '>' + settings.target + '|' + settings.autoReverse +
+        '|' + settings.autoDetectSource) {
       resetDirection();
     }
     applyColors();
@@ -524,7 +637,7 @@
 
   chrome_.storage.local.get('settings', function (data) {
     applySettings(data && data.settings);
-    if (settings.autoTranslate) { run(); }
+    if (settings.autoTranslate && !isExcluded()) { run(); }
   });
 
   chrome_.runtime.onMessage.addListener(function (message, sender, reply) {
@@ -549,6 +662,12 @@
         applySettings(message.settings);
         lookup(selectedText() || message.text || '');
         reply({ ok: true });
+        break;
+      case 'll-site':
+        reply({
+          host: location.hostname.replace(/^www\./, ''),
+          excluded: isExcluded()
+        });
         break;
       case 'll-reset':
         location.reload();
