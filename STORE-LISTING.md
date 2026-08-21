@@ -71,7 +71,11 @@ translator. The extension will tell you if your Chrome is too old.
 59 languages, any pair among them.
 ```
 
-**Privacy policy URL**: **YOU** — the public URL where you host `PRIVACY.md`.
+**Privacy policy URL**
+
+```
+https://github.com/gaborkalmar83/langualens-extension/blob/main/PRIVACY.md
+```
 
 ---
 
