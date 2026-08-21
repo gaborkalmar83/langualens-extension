@@ -41,6 +41,7 @@
       ],
       "js": [
         "languages.js",
+        "colors.js",
         "translator.js",
         "content.js"
       ],

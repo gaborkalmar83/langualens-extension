@@ -1,13 +1,21 @@
 /* Injected on every page but inert until LanguaLens is actually run. */
 
+/* Set from the content script out of the user's colour choice. The fallbacks
+   keep the reader legible if the script has not applied them yet. */
+:root {
+  --ll-tr-color: #0072B2;
+  --ll-tr-color-dark: #7FB2FF;
+}
+
 .ll-tr {
   display: block !important;
-  color: #2f6fe4;
+  /* important, because some pages force a colour onto every descendant. */
+  color: var(--ll-tr-color) !important;
   font-style: italic;
   font-size: 0.92em;
   line-height: 1.45;
   margin: 4px 0 14px 0;
-  border-left: 3px solid rgba(47, 111, 228, .35);
+  border-left: 3px solid color-mix(in srgb, var(--ll-tr-color) 35%, transparent);
   padding-left: 10px;
   font-family: inherit;
   text-align: left;
@@ -17,8 +25,8 @@
 .ll-tr:empty { display: none !important; }
 
 .ll-tr.ll-veil {
-  color: transparent;
-  background: rgba(47, 111, 228, .13);
+  color: transparent !important;
+  background: color-mix(in srgb, var(--ll-tr-color) 13%, transparent);
   border-radius: 5px;
   cursor: pointer;
   user-select: none;
@@ -26,18 +34,24 @@
 
 .ll-tr.ll-veil::after {
   content: attr(data-hint);
-  color: #2f6fe4;
+  color: var(--ll-tr-color);
   font-size: .8em;
   opacity: .7;
 }
 
-.ll-tr.ll-veil.ll-open { color: #2f6fe4; background: transparent; }
+.ll-tr.ll-veil.ll-open { color: var(--ll-tr-color) !important; background: transparent; }
 .ll-tr.ll-veil.ll-open::after { content: ""; }
 
 @media (prefers-color-scheme: dark) {
-  .ll-tr { color: #7fb2ff; border-left-color: rgba(127, 178, 255, .4); }
-  .ll-tr.ll-veil.ll-open { color: #7fb2ff; }
-  .ll-tr.ll-veil::after { color: #7fb2ff; }
+  .ll-tr {
+    color: var(--ll-tr-color-dark) !important;
+    border-left-color: color-mix(in srgb, var(--ll-tr-color-dark) 40%, transparent);
+  }
+  .ll-tr.ll-veil {
+    background: color-mix(in srgb, var(--ll-tr-color-dark) 16%, transparent);
+  }
+  .ll-tr.ll-veil.ll-open { color: var(--ll-tr-color-dark) !important; }
+  .ll-tr.ll-veil::after { color: var(--ll-tr-color-dark); }
 }
 
 #ll-bar {

@@ -39,6 +39,14 @@ page, telling you it did. It is a checkbox, on by default.
 **Vocabulary.** Saved words keep the sentence they came from and the page they came
 from, and export as a tab separated file that Anki imports directly.
 
+**Adjustable translation colour.** Five presets plus any custom colour, in the popup.
+Each preset carries a separate value for light and dark pages, since a colour that
+reads well on white rarely reads well on black; the swatch shows both halves. The
+preset hues come from the Okabe-Ito palette, which stays distinguishable from ordinary
+body text under the common forms of colour blindness, and there is a maximum contrast
+option for anyone who cannot use hue at all. Colour is never the only cue in any case:
+translations are also italic and carry a left bar.
+
 59 languages, any pair among them.
 
 ---

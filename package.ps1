@@ -14,6 +14,7 @@ $include = @(
   'content.js',
   'content.css',
   'languages.js',
+  'colors.js',
   'translator.js',
   'popup.html',
   'popup.css',

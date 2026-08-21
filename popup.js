@@ -8,6 +8,9 @@ const DEFAULTS = {
   autoLookup: true,
   autoTranslate: false,
   autoReverse: true,
+  colorPreset: 'blue',
+  colorLight: '',
+  colorDark: '',
   hint: 'tap to reveal'
 };
 
@@ -111,6 +114,37 @@ async function loadSaved() {
   renderSaved(data.saved || []);
 }
 
+
+/* One swatch per preset. Each shows the light and dark value it will actually
+ * use, split down the middle, so the choice can be judged for both themes. */
+function renderSwatches() {
+  const host = $('swatches');
+  host.innerHTML = '';
+  host.setAttribute('role', 'radiogroup');
+  host.setAttribute('aria-label', 'Translation colour');
+
+  self.LLColors.PRESETS.forEach((preset) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', String(settings.colorPreset === preset.id));
+    b.title = preset.name;
+    b.setAttribute('aria-label', preset.name);
+    b.style.background =
+      `linear-gradient(135deg, ${preset.light} 0 50%, ${preset.dark} 50% 100%)`;
+    b.addEventListener('click', async () => {
+      await save({ colorPreset: preset.id });
+      renderSwatches();
+    });
+    host.appendChild(b);
+  });
+
+  const custom = $('customColor');
+  custom.value = settings.colorLight || self.LLColors.resolve(settings).light;
+  custom.parentElement.style.outline =
+    settings.colorPreset === 'custom' ? '2px solid var(--fg)' : 'none';
+}
+
 async function init() {
   const data = await chrome.storage.local.get('settings');
   settings = { ...DEFAULTS, ...(data.settings || {}) };
@@ -122,6 +156,8 @@ async function init() {
   $('autoLookup').checked = settings.autoLookup;
   $('autoTranslate').checked = settings.autoTranslate;
   $('autoReverse').checked = settings.autoReverse;
+
+  renderSwatches();
 
   await refreshStatus();
   await loadSaved();
@@ -148,6 +184,13 @@ async function init() {
   $('autoLookup').addEventListener('change', (e) => save({ autoLookup: e.target.checked }));
   $('autoTranslate').addEventListener('change', (e) => save({ autoTranslate: e.target.checked }));
   $('autoReverse').addEventListener('change', (e) => save({ autoReverse: e.target.checked }));
+
+  /* A custom colour is applied to both themes; the user sees it on whichever
+   * one they are actually reading in. */
+  $('customColor').addEventListener('input', async (e) => {
+    await save({ colorPreset: 'custom', colorLight: e.target.value, colorDark: e.target.value });
+    renderSwatches();
+  });
 
   /* Chrome wants a user gesture before it will fetch a model, which is exactly
    * what this button is. */

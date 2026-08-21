@@ -30,6 +30,9 @@
     autoLookup: true,
     autoTranslate: false,
     autoReverse: true,
+    colorPreset: 'blue',
+    colorLight: '',
+    colorDark: '',
     hint: 'tap to reveal'
   };
 
@@ -498,6 +501,15 @@
   }
 
   /* --------------------------- messaging --------------------------- */
+  /* Pushes the chosen colour into the CSS custom properties content.css reads.
+   * Set on the root element so the page's own stylesheet cannot outrank it. */
+  function applyColors() {
+    var c = self.LLColors.resolve(settings);
+    var root = document.documentElement;
+    root.style.setProperty('--ll-tr-color', c.light);
+    root.style.setProperty('--ll-tr-color-dark', c.dark);
+  }
+
   function applySettings(next) {
     if (!next) { return; }
     var before = settings.source + '>' + settings.target + '|' + settings.autoReverse;
@@ -507,6 +519,7 @@
     if (before !== settings.source + '>' + settings.target + '|' + settings.autoReverse) {
       resetDirection();
     }
+    applyColors();
   }
 
   chrome_.storage.local.get('settings', function (data) {

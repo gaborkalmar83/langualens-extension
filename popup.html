@@ -35,6 +35,21 @@
 
   <hr>
 
+  <div class="colors">
+    <span class="label">Translation colour</span>
+    <div id="swatches" class="swatches"></div>
+    <label class="custom">
+      <input type="color" id="customColor">
+      <span>Custom</span>
+    </label>
+    <p class="hint">
+      Translations are also italic and have a left bar, so they stay
+      distinguishable without relying on colour.
+    </p>
+  </div>
+
+  <hr>
+
   <div class="row spread">
     <span id="savedCount">0 saved</span>
     <span>
@@ -67,6 +82,7 @@
   </details>
 
   <script src="languages.js"></script>
+  <script src="colors.js"></script>
   <script src="translator.js"></script>
   <script src="popup.js"></script>
 </body>

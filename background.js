@@ -9,6 +9,9 @@ const DEFAULTS = {
   autoLookup: true,
   autoTranslate: false,
   autoReverse: true,
+  colorPreset: 'blue',
+  colorLight: '',
+  colorDark: '',
   hint: 'tap to reveal'
 };
 
