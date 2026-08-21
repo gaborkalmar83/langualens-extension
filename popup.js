@@ -68,6 +68,12 @@ async function refreshStatus() {
   } else if (states.some((s) => s === 'downloading')) {
     status.textContent = 'Downloading model…';
     download.classList.add('hidden');
+  } else if (states.some((s) => s === 'unknown')) {
+    /* Chrome did not answer in time. Offer the download rather than claiming
+     * something is wrong; translating will still be attempted either way. */
+    status.textContent =
+      'Chrome did not report the model status. Try Download model, or just translate.';
+    download.classList.remove('hidden');
   } else {
     status.textContent = 'Chrome cannot translate this pair.';
     download.classList.add('hidden');

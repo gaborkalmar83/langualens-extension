@@ -14,15 +14,26 @@
     return typeof root.Translator !== 'undefined';
   }
 
-  /** 'available' | 'downloadable' | 'downloading' | 'unavailable' | 'unsupported' */
+  /* Translator.availability() has been observed never settling in some Chrome
+   * builds, which would leave every caller awaiting forever. Callers treat
+   * 'unknown' as "go ahead and try": create() then either succeeds or fails
+   * fast, which beats a page that silently does nothing. */
+  var AVAILABILITY_TIMEOUT_MS = 4000;
+
+  /** 'available' | 'downloadable' | 'downloading' | 'unavailable' | 'unsupported' | 'unknown' */
   async function availability(source, target) {
     if (!supported()) { return 'unsupported'; }
     if (source === target) { return 'available'; }
     try {
-      return await root.Translator.availability({
-        sourceLanguage: source,
-        targetLanguage: target
-      });
+      return await Promise.race([
+        root.Translator.availability({
+          sourceLanguage: source,
+          targetLanguage: target
+        }),
+        new Promise(function (resolve) {
+          setTimeout(function () { resolve('unknown'); }, AVAILABILITY_TIMEOUT_MS);
+        })
+      ]);
     } catch (e) {
       return 'unavailable';
     }

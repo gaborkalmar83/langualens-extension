@@ -440,6 +440,7 @@
       toast('This language pair is not available in Chrome.');
       return;
     }
+    /* 'unknown' means Chrome never answered. Try anyway rather than stop. */
     if (state === 'downloadable') {
       toast(
         'Open the LanguaLens popup and download the ' +
