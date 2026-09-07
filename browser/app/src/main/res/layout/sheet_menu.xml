@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="18dp">
+
+    <TextView android:id="@+id/mNewTab" style="@style/SheetRow"
+        android:text="@string/new_tab"
+        android:drawableStart="@drawable/ic_add" />
+
+    <TextView android:id="@+id/mReload" style="@style/SheetRow"
+        android:text="@string/reload"
+        android:drawableStart="@drawable/ic_reload" />
+
+    <TextView android:id="@+id/mShare" style="@style/SheetRow"
+        android:text="@string/share"
+        android:drawableStart="@drawable/ic_share" />
+
+    <TextView android:id="@+id/mChrome" style="@style/SheetRow"
+        android:text="@string/open_in_chrome"
+        android:drawableStart="@drawable/ic_open_external" />
+
+    <TextView android:id="@+id/mSaved" style="@style/SheetRow"
+        android:text="@string/saved_title"
+        android:drawableStart="@drawable/ic_star" />
+
+    <TextView android:id="@+id/mSettings" style="@style/SheetRow"
+        android:text="@string/settings"
+        android:drawableStart="@drawable/ic_settings" />
+
+    <TextView android:id="@+id/mDefault" style="@style/SheetRow"
+        android:text="@string/make_default"
+        android:drawableStart="@drawable/ic_check" />
+</LinearLayout>

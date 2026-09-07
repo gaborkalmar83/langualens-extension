@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@color/page_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bar_bg"
+        android:paddingStart="10dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <EditText
+            android:id="@+id/urlBar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:background="@drawable/url_field"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:textColor="@color/bar_fg"
+            android:textColorHint="@color/bar_hint"
+            android:hint="@string/url_hint"
+            android:imeOptions="actionGo"
+            android:inputType="textUri"
+            android:selectAllOnFocus="true"
+            android:importantForAutofill="no"
+            android:contentDescription="@string/url_hint" />
+
+        <ImageButton
+            android:id="@+id/btnTranslate"
+            style="@style/BarButton"
+            android:src="@drawable/ic_translate"
+            android:contentDescription="@string/translate" />
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            style="@style/BarButton"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="@string/menu" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loadBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:max="100"
+        android:visibility="gone"
+        android:progressTint="@color/accent"
+        android:progressBackgroundTint="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:padding="10dp"
+        android:textSize="13sp"
+        android:textColor="@color/bar_fg"
+        android:background="@color/status_bg" />
+
+    <FrameLayout
+        android:id="@+id/webContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:background="@color/bar_bg">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            style="@style/NavButton"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/back" />
+
+        <ImageButton
+            android:id="@+id/btnForward"
+            style="@style/NavButton"
+            android:src="@drawable/ic_forward"
+            android:contentDescription="@string/forward" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/btnTabs"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="1"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/bar_fg"
+                android:background="@drawable/tabs_badge"
+                android:contentDescription="@string/tabs" />
+        </FrameLayout>
+
+        <ImageButton
+            android:id="@+id/btnChrome"
+            style="@style/NavButton"
+            android:src="@drawable/ic_open_external"
+            android:contentDescription="@string/open_in_chrome" />
+
+        <ImageButton
+            android:id="@+id/btnNewTab"
+            style="@style/NavButton"
+            android:src="@drawable/ic_add"
+            android:contentDescription="@string/new_tab" />
+    </LinearLayout>
+</LinearLayout>

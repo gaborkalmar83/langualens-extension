@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#0072B2</color>
+    <color name="page_bg">#FBFAF7</color>
+    <color name="bar_bg">#FFFFFF</color>
+    <color name="bar_fg">#1C222C</color>
+    <color name="bar_hint">#8A93A3</color>
+    <color name="field_bg">#EEF0F4</color>
+    <color name="status_bg">#E4EDF8</color>
+    <color name="row_selected">#1A0072B2</color>
+    <color name="ic_launcher_background">#1B2A4A</color>
+</resources>
