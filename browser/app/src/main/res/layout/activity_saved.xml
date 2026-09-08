@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@color/page_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bar_bg">
+
+        <ImageButton
+            android:id="@+id/savedBack"
+            android:layout_width="52dp"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:tint="@color/bar_fg"
+            android:contentDescription="@string/back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/saved_title"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="@color/bar_fg" />
+
+        <TextView
+            android:id="@+id/savedExport"
+            style="@style/BarAction"
+            android:text="@string/export" />
+
+        <TextView
+            android:id="@+id/savedClear"
+            style="@style/BarAction"
+            android:text="@string/clear_all" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/savedEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="32dp"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:alpha="0.65"
+                android:textColor="@color/bar_fg"
+                android:visibility="gone"
+                android:text="@string/saved_empty" />
+
+            <LinearLayout
+                android:id="@+id/savedList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

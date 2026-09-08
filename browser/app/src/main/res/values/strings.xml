@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LanguaLens</string>
+
+    <!-- browser chrome -->
+    <string name="url_hint">Search or type an address</string>
+    <string name="translate">Translate this page</string>
+    <string name="menu">Menu</string>
+    <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="tabs">Tabs</string>
+    <string name="new_tab">New tab</string>
+    <string name="close_tab">Close tab</string>
+    <string name="reload">Reload</string>
+    <string name="share">Share</string>
+    <string name="settings">Settings</string>
+    <string name="open_in_chrome">Open in Chrome</string>
+    <string name="make_default">Make this my default browser</string>
+
+    <!-- reading -->
+    <string name="tap_to_reveal">tap to reveal</string>
+    <string name="reading">Reading</string>
+    <string name="browser">Browser</string>
+    <string name="known_language">I understand</string>
+    <string name="page_language">Page is in</string>
+    <string name="detect_automatically">Detect automatically</string>
+    <string name="mode">Translate</string>
+    <string name="mode_paragraph">Per paragraph</string>
+    <string name="mode_sentence">Per sentence</string>
+    <string name="color">Translation colour</string>
+    <string name="translate_automatically">Translate every page as it loads</string>
+    <string name="hide_until_tapped">Hide the translation until I tap it</string>
+    <string name="never_here">Never translate %1$s</string>
+    <string name="search_engine">Search with</string>
+    <string name="default_browser">Default browser</string>
+    <string name="models">Downloaded languages</string>
+    <string name="models_none">Nothing downloaded yet. A language is fetched the first time you read a page in it.</string>
+    <string name="models_delete_body">Delete this language model? It will be downloaded again the next time you read a page in that language.</string>
+
+    <!-- messages -->
+    <string name="downloading">Downloading %1$s, one time only…</string>
+    <string name="already_in">This page is already in %1$s</string>
+    <string name="cannot_detect">Could not tell what language this page is in</string>
+    <string name="no_translation">No translation</string>
+    <string name="reader_missing">The reader script is missing from this build</string>
+    <string name="no_browser">No other browser is installed</string>
+    <string name="nothing_to_hand_over">Nothing to hand over yet</string>
+    <string name="excluded_here">%1$s is on your never-translate list</string>
+    <string name="saved">Saved</string>
+    <string name="already_saved">Already saved</string>
+    <string name="deleted">Deleted</string>
+    <string name="delete_failed">Could not delete that model</string>
+    <string name="nothing_to_export">Nothing saved yet</string>
+
+    <!-- saved words -->
+    <string name="saved_title">Saved words</string>
+    <string name="saved_empty">Select any text while reading and tap the star. What you save lands here, with the sentence it came from.</string>
+    <string name="export">Export</string>
+    <string name="clear_all">Clear</string>
+    <string name="clear_all_body">Delete every saved word? This cannot be undone.</string>
+    <string name="remove">Remove</string>
+    <string name="delete">Delete</string>
+
+    <!-- first run -->
+    <string name="welcome_title">Which language do you understand?</string>
+    <string name="default_title">Make LanguaLens your default browser?</string>
+    <string name="default_body">Links from other apps will then open here, translated. You can hand any page over to Chrome at any time with the button in the bottom bar.</string>
+    <string name="default_yes">Set as default</string>
+    <string name="not_now">Not now</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="version_line">Version %1$s</string>
+    <string name="privacy_line">Pages are translated on this device. Nothing you read is sent to a translation server.</string>
+</resources>
