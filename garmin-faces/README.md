@@ -1,6 +1,6 @@
 # Maison collection
 
-Forty luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be sold separately at 0.99.
+Seventy luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be sold separately at 0.99.
 
 ![Collection](design/collection.png)
 
@@ -37,6 +37,25 @@ Thirty more, numbered. Ten different layouts, three takes on each, so no two nei
 | Bicolor | 20, 30, 40 | A two-tone dial, split in the middle |
 
 Folders are named by number, for example `11-orrery-gold`.
+
+## Faces 41 to 70
+
+Thirty faces inspired by the most famous watch types ever sold. The style is borrowed, the names and details are our own: no brand name, logo or exact dial is copied.
+
+![Faces 41 to 70](design/collection-3.png)
+
+| Layout | Numbers | Inspired by |
+| --- | --- | --- |
+| Abyss | 41, 51, 61 | The classic dive watch |
+| Voyager | 42, 52, 62 | The two-tone travel (GMT) watch |
+| Grand Prix | 43, 53, 63 | The racing chronograph and the moon watch |
+| Octave | 44, 54, 64 | The octagon steel sports watch |
+| Laurel | 45, 55, 65 | The fluted-bezel dress watch |
+| Summit | 46, 56, 66 | The expedition and field watch |
+| Station | 47, 57, 67 | The railway station clock |
+| Quartz | 48, 58, 68 | The cheap, loved LCD digital |
+| Diode | 49, 59, 69 | The seventies LED watch |
+| Atelier | 50, 60, 70 | The rectangular art deco dress watch |
 
 ## What the faces show
 

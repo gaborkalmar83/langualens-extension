@@ -166,6 +166,12 @@ class LuxFace extends WatchUi.WatchFace {
                 }
             }
             dc.setPenWidth(1);
+        } else if (p == 7 || p == 8) {   // 7 square grid, 8 horizontal stripes
+            var cell = r / 7;
+            for (var z = -7; z <= 7; z++) {
+                dc.drawLine(cx - r, cy + z * cell, cx + r, cy + z * cell);
+                if (p == 7) { dc.drawLine(cx + z * cell, cy - r, cx + z * cell, cy + r); }
+            }
         } else if (p == 5) {     // pinstripes
             var gap = r / 8;
             for (var v = -8; v <= 8; v++) {
@@ -174,7 +180,66 @@ class LuxFace extends WatchUi.WatchFace {
         }
     }
 
+    // ---- wide bezels: 1 dive, 2 two-tone travel, 3 tachymeter, 4 fluted, 5 octagon ----
+    hidden function wideBezel(dc, bz) {
+        var TAU = Math.PI * 2;
+        var R = r;
+        dc.setPenWidth((R * 0.21).toNumber());
+        dc.setColor(c[:bezc], Graphics.COLOR_TRANSPARENT);
+        dc.drawCircle(cx, cy, R * 0.90);
+        if (bz == 2) {
+            dc.setColor(c[:bezc2], Graphics.COLOR_TRANSPARENT);
+            dc.drawArc(cx, cy, R * 0.90, Graphics.ARC_CLOCKWISE, 0, 180);
+        }
+        dc.setPenWidth(1);
+        if (bz == 1 || bz == 2) {
+            var tip = pt(0, R * 0.83, 0);
+            dc.setColor(c[:bezt], Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon([pt(0, R * 0.97, R * 0.07), pt(0, R * 0.97, -R * 0.07), tip]);
+            for (var i = 1; i < 12; i++) {
+                var a = TAU * i / 12;
+                if (i % 2 == 0) {
+                    var p = pt(a, R * 0.90, 0);
+                    text(dc, p[0], p[1], Graphics.FONT_XTINY, ((bz == 1) ? i * 5 : i * 2).toString(), c[:bezt]);
+                } else {
+                    bar(dc, a, R * 0.85, R * 0.95, R * 0.012, c[:bezt]);
+                }
+            }
+        } else if (bz == 3) {
+            var labs = ["300", "200", "150", "120", "100", "80", "70", "60"];
+            var deg = [72, 108, 144, 180, 216, 270, 308, 360];
+            for (var j = 0; j < 8; j++) {
+                var q = pt(TAU * deg[j] / 360, R * 0.90, 0);
+                text(dc, q[0], q[1], Graphics.FONT_XTINY, labs[j], c[:bezt]);
+            }
+        } else if (bz == 4) {
+            for (var k = 0; k < 72; k++) {
+                bar(dc, TAU * k / 72, R * 0.81, R * 0.995, R * 0.04, (k % 2 == 0) ? c[:metal] : c[:metal2]);
+            }
+        } else if (bz == 5) {
+            for (var e = 0; e < 8; e++) {
+                var a0 = TAU * (e * 45 + 22.5) / 360;
+                var a1 = TAU * (e * 45 + 67.5) / 360;
+                var am = (a0 + a1) / 2;
+                dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+                dc.fillPolygon([pt(a0, R, 0), pt((a0 + am) / 2, R * 1.05, 0), pt(am, R * 1.05, 0), pt((a1 + am) / 2, R * 1.05, 0), pt(a1, R, 0)]);
+                var s0 = pt(a0, R, 0);
+                var s1 = pt(a1, R, 0);
+                dc.setPenWidth(2);
+                dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(s0[0], s0[1], s1[0], s1[1]);
+                dc.setPenWidth(1);
+                var sc = pt(TAU * e / 8, R * 0.87, 0);
+                dc.fillCircle(sc[0], sc[1], R * 0.04);
+                dc.setColor(c[:bezc], Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(sc[0] - R * 0.03, sc[1], sc[0] + R * 0.03, sc[1]);
+            }
+        }
+        r = R * 0.80;
+    }
+
     hidden function bezel(dc) {
+        if (c[:bez] != 0) { wideBezel(dc, c[:bez]); }
         var bw = (r * 0.05).toNumber();
         if (bw < 3) { bw = 3; }
         dc.setPenWidth(bw);
@@ -203,6 +268,33 @@ class LuxFace extends WatchUi.WatchFace {
             var quarter = (h % 3 == 0);
             var taken = (h == 3 && (c[:right] != 0 || c[:date])) || (h == 6 && c[:bottom] != 0) || (h == 9 && c[:left] != 0);
             if (c[:digital] && !quarter) { continue; }
+            if (st >= 4) {
+                // 4 diver, 5 explorer, 6 field, 7 railway
+                if (taken && c[:date] && h == 3) { continue; }
+                if ((st == 4 || st == 5) && h == 0) {
+                    dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                    dc.fillPolygon([pt(a, r * 0.84, r * 0.07), pt(a, r * 0.84, -r * 0.07), pt(a, r * 0.66, 0)]);
+                } else if (st == 4) {
+                    if (quarter) {
+                        bar(dc, a, r * 0.66, r * 0.84, r * 0.04, c[:metal]);
+                    } else {
+                        var dp = pt(a, r * 0.76, 0);
+                        dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                        dc.fillCircle(dp[0], dp[1], r * 0.055);
+                    }
+                } else if (st == 5 && quarter && !taken) {
+                    var ep = pt(a, r * 0.70, 0);
+                    text(dc, ep[0], ep[1], Graphics.FONT_SMALL, (h == 0 ? 12 : h).toString(), c[:metal]);
+                } else if (st == 6 && !taken) {
+                    var fp = pt(a, r * 0.70, 0);
+                    text(dc, fp[0], fp[1], Graphics.FONT_TINY, (h == 0 ? 12 : h).toString(), c[:metal]);
+                } else if (st == 7) {
+                    bar(dc, a, r * 0.62, r * 0.86, r * 0.04, c[:metal]);
+                } else {
+                    bar(dc, a, r * 0.72, r * 0.84, r * 0.02, c[:metal]);
+                }
+                continue;
+            }
             if (st == 2) {
                 var g = pt(a, r * 0.78, 0);
                 dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
@@ -358,6 +450,15 @@ class LuxFace extends WatchUi.WatchFace {
         hand(dc, ha, r * 0.50, r * 0.055, color, outline);
         hand(dc, ma, r * 0.80, r * 0.042, color, outline);
         if (outline) { return; }
+        if (c[:gmt]) {
+            var ga = Math.PI * 2 * ((Time.now().value() % 86400) / 86400.0);
+            var g0 = pt(ga, r * 0.86, 0);
+            dc.setPenWidth(2);
+            dc.setColor(c[:accent], Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(cx, cy, g0[0], g0[1]);
+            dc.setPenWidth(1);
+            dc.fillPolygon([pt(ga, r * 0.92, 0), pt(ga, r * 0.78, r * 0.06), pt(ga, r * 0.78, -r * 0.06)]);
+        }
         if (!_sleep && c[:sweep]) {
             var sa = Math.PI * 2 * t.sec / 60;
             var p0 = pt(sa, -r * 0.18, 0);
@@ -561,6 +662,59 @@ class LuxFace extends WatchUi.WatchFace {
             text(dc, cx, cy + r * 0.62, Graphics.FONT_NUMBER_MILD, H, c[:txt]);
             text(dc, cx - r * 0.52, cy + r * 0.45, Graphics.FONT_XTINY, "0", c[:metal2]);
             text(dc, cx + r * 0.52, cy + r * 0.45, Graphics.FONT_XTINY, "60", c[:metal2]);
+        } else if (L == 11) {   // retro LCD
+            var lw = r * 1.36;
+            var lh = r * 0.80;
+            var x0 = cx - lw / 2;
+            var y0 = cy - lh / 2 + r * 0.04;
+            text(dc, cx, cy - r * 0.62, Graphics.FONT_XTINY, c[:mark], c[:metal]);
+            dc.setPenWidth(2);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.drawRoundedRectangle(x0 - 5, y0 - 5, lw + 10, lh + 10, r * 0.08);
+            dc.setPenWidth(1);
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(x0, y0, lw, lh, r * 0.05);
+            text(dc, cx - lw * 0.24, y0 + lh * 0.20, Graphics.FONT_XTINY, date, c[:txt]);
+            text(dc, cx + lw * 0.30, y0 + lh * 0.20, Graphics.FONT_XTINY, System.getSystemStats().battery.toNumber() + "%", c[:txt]);
+            dc.setColor(c[:txt], Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(x0 + lw * 0.05, y0 + lh * 0.36, x0 + lw * 0.95, y0 + lh * 0.36);
+            text(dc, cx - lw * 0.10, y0 + lh * 0.66, Graphics.FONT_NUMBER_MEDIUM, H + ":" + M, c[:txt]);
+            text(dc, cx + lw * 0.38, y0 + lh * 0.72, Graphics.FONT_SMALL, _sleep ? "--" : t.sec.format("%02d"), c[:txt]);
+            text(dc, cx, cy + r * 0.66, Graphics.FONT_XTINY, "WATER RESIST", c[:accent]);
+        } else if (L == 12) {   // seventies LED
+            dc.setPenWidth(3);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.drawRoundedRectangle(cx - r * 0.80, cy - r * 0.50, r * 1.60, r * 1.00, r * 0.22);
+            dc.setPenWidth(1);
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(cx - r * 0.66, cy - r * 0.30, r * 1.32, r * 0.60, r * 0.08);
+            text(dc, cx, cy, Graphics.FONT_NUMBER_MEDIUM, H + ":" + M, c[:accent]);
+            text(dc, cx, cy - r * 0.68, Graphics.FONT_XTINY, date, c[:metal2]);
+            text(dc, cx, cy + r * 0.68, Graphics.FONT_XTINY, c[:mark], c[:metal2]);
+        } else if (L == 14) {   // rectangular dress watch
+            var fw = r * 1.04;
+            var fh = r * 1.56;
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(cx - fw / 2, cy - fh / 2, fw, fh, r * 0.08);
+            dc.setPenWidth(4);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.drawRoundedRectangle(cx - fw / 2, cy - fh / 2, fw, fh, r * 0.08);
+            dc.setPenWidth(1);
+            dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+            dc.drawRectangle(cx - fw * 0.24, cy - fh * 0.28, fw * 0.48, fh * 0.56);
+            dc.drawRectangle(cx - fw * 0.21, cy - fh * 0.26, fw * 0.42, fh * 0.52);
+            var rom = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+            for (var n = 0; n < 12; n++) {
+                var na = TAU * n / 12;
+                var sx = Math.sin(na);
+                var sy = -Math.cos(na);
+                var kx = (sx.abs() < 0.001) ? 9999.0 : fw * 0.37 / sx.abs();
+                var ky = (sy.abs() < 0.001) ? 9999.0 : fh * 0.40 / sy.abs();
+                var sc = (kx < ky) ? kx : ky;
+                text(dc, cx + sx * sc, cy + sy * sc, Graphics.FONT_XTINY, rom[n], c[:txt]);
+            }
+            r = r * 0.50;
+            hands(dc, t, c[:hand], false);
         } else {                // split: two-tone dial, hour left, minute right
             dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
             if (v == 1) {

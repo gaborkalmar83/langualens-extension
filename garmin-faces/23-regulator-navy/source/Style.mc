@@ -23,6 +23,11 @@ module Style {
         :sweep => false,
         :layout => 3,
         :v => 1,
-        :bezel => true
+        :bezel => true,
+        :bez => 0,
+        :gmt => false,
+        :bezc => 0x000000,
+        :bezc2 => 0x000000,
+        :bezt => 0xFFFFFF
     };
 }
