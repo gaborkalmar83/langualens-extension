@@ -1,0 +1,41 @@
+name: Azure design images
+
+# Generates the concept images with Azure image generation.
+# Needs these repository secrets: AZURE_IMAGE_ENDPOINT, AZURE_IMAGE_API_KEY
+# and, unless the endpoint is a full Target URI, AZURE_IMAGE_DEPLOYMENT.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "garmin-faces/design/shots.yaml"
+      - "garmin-pulsar/design/shots.yaml"
+      - ".github/workflows/azure-images.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_IMAGE_ENDPOINT: ${{ secrets.AZURE_IMAGE_ENDPOINT }}
+      AZURE_IMAGE_API_KEY: ${{ secrets.AZURE_IMAGE_API_KEY }}
+      AZURE_IMAGE_DEPLOYMENT: ${{ secrets.AZURE_IMAGE_DEPLOYMENT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate images
+        run: |
+          if [ -z "$AZURE_IMAGE_ENDPOINT" ] || [ -z "$AZURE_IMAGE_API_KEY" ]; then
+            echo "::warning::Azure secrets are not set. Add AZURE_IMAGE_ENDPOINT and AZURE_IMAGE_API_KEY, then run this workflow again."
+            exit 0
+          fi
+          pip install --quiet pyyaml pillow
+          python3 tools/azimg.py batch garmin-faces/design/shots.yaml
+          python3 tools/azimg.py batch garmin-pulsar/design/shots.yaml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: azure-design-images
+          path: |
+            garmin-faces/design/concepts/
+            garmin-pulsar/design/concepts/
+          if-no-files-found: ignore
