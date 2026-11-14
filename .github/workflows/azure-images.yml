@@ -30,8 +30,8 @@ jobs:
             exit 0
           fi
           pip install --quiet pyyaml pillow
-          python3 tools/azimg.py batch garmin-faces/design/shots.yaml
-          python3 tools/azimg.py batch garmin-pulsar/design/shots.yaml
+          python3 tools/azure/scripts/azimg.py batch garmin-faces/design/shots.yaml
+          python3 tools/azure/scripts/azimg.py batch garmin-pulsar/design/shots.yaml
       - uses: actions/upload-artifact@v4
         with:
           name: azure-design-images

@@ -1,0 +1,14 @@
+{
+  "slow-dutch-stories": {
+    "prompt": "Warm, friendly flat vector illustration with soft grain and gentle shading. Palette: cream background, warm orange, soft brown, deep blue accents. Simple rounded shapes, clean outlines, cozy everyday life in a small Dutch town (brick houses, bicycles, canals, big windows) where it fits the scene. Adult audience, calm and kind mood. Wide composition with empty space on one side for text that will be added later.",
+    "sizes": {"long": "1536x1024", "short": "1024x1536", "fit_long": "1920x1080", "fit_short": "1080x1920"}
+  },
+  "ai-work-pass": {
+    "prompt": "Clean, modern editorial illustration for a professional training video. Flat shapes, subtle depth, calm palette of cream, deep navy and warm orange. Diverse office workers using laptops and phones in bright modern European workplaces. Trustworthy, practical, not futuristic, no robots, no glowing brains, no circuit patterns. Leave clear empty space for text that will be added later.",
+    "sizes": {"long": "1536x1024", "short": "1024x1536", "fit_long": "1920x1080", "fit_short": "1080x1920"}
+  },
+  "thumbnail-bold": {
+    "prompt": "Bold, high-contrast illustration made to read at small size. One clear subject, large and centered slightly to the right, simple background, strong warm colours, no small details. Leave the left 45 percent of the image calm and empty for big title text that will be added later.",
+    "sizes": {"long": "1536x1024", "fit_long": "1280x720"}
+  }
+}
