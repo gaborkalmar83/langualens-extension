@@ -144,6 +144,23 @@ class LuxFace extends WatchUi.WatchFace {
                 dc.setColor((s % 6 == 0) ? c[:metal] : c[:pat], Graphics.COLOR_TRANSPARENT);
                 dc.fillCircle(sx, sy, (s % 9 == 0) ? 2 : 1);
             }
+        } else if (p == 6) {     // skeleton gears
+            var gears = [[-0.30, -0.28, 0.26], [0.34, -0.20, 0.20], [0.30, 0.30, 0.24], [-0.36, 0.26, 0.16], [0.0, 0.0, 0.14]];
+            dc.setPenWidth(2);
+            for (var g = 0; g < gears.size(); g++) {
+                var gx = cx + r * gears[g][0];
+                var gy = cy + r * gears[g][1];
+                var gr = r * gears[g][2];
+                dc.drawCircle(gx, gy, gr);
+                dc.drawCircle(gx, gy, gr * 0.82);
+                dc.drawCircle(gx, gy, gr * 0.28);
+                for (var sp = 0; sp < 6; sp++) {
+                    var ga = Math.PI * sp / 3 + g;
+                    dc.drawLine(gx + gr * 0.28 * Math.sin(ga), gy - gr * 0.28 * Math.cos(ga),
+                                gx + gr * 0.82 * Math.sin(ga), gy - gr * 0.82 * Math.cos(ga));
+                }
+            }
+            dc.setPenWidth(1);
         } else if (p == 5) {     // pinstripes
             var gap = r / 8;
             for (var v = -8; v <= 8; v++) {

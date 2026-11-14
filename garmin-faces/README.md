@@ -1,6 +1,6 @@
 # Maison collection
 
-Ten luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be sold separately at 0.99.
+Forty luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be sold separately at 0.99.
 
 ![Collection](design/collection.png)
 
@@ -17,6 +17,23 @@ Ten luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be s
 | Deco Imperial | `deco-imperial` | Art deco digital in black and gold. |
 | Ivory Heritage | `ivory-heritage` | Cream enamel and blued steel. |
 
+## Faces 11 to 40
+
+Thirty more, numbered, in six styles of five.
+
+![Faces 11 to 40](design/collection-2.png)
+
+| Numbers | Style |
+| --- | --- |
+| 11 to 15 | Classic dress: roman numerals, engraved dial, small seconds |
+| 16 to 20 | Racing chronograph: carbon dial, heart rate, steps, small seconds |
+| 21 to 25 | Art deco digital: pinstripes, power reserve |
+| 26 to 30 | Celestial: star field, gem markers, moon phase |
+| 31 to 35 | Modern minimal: clean dial, date |
+| 36 to 40 | Skeleton: gears visible behind the hands |
+
+Folders are named by number, for example `11-sable-regent`.
+
 ## What the faces show
 
 - Time, with a sweeping seconds hand on some faces while the watch is awake
@@ -29,7 +46,7 @@ All names and designs are original. No real watch brand is copied.
 ## How it is built
 
 - `faces.json` holds the look of every face.
-- `python3 gen.py` writes the ten projects (manifest, icon, `Style.mc`) and the mock-ups in `design/`.
+- `python3 gen.py` writes all the projects (manifest, icon, `Style.mc`) and the mock-ups in `design/`.
 - `common/source/LuxFace.mc` is the one renderer all faces share.
 
 Change a colour in `faces.json`, run `gen.py`, done.

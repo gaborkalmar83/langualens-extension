@@ -14,13 +14,24 @@ permissions:
   contents: read
 
 jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      faces: ${{ steps.faces.outputs.faces }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: faces
+        run: echo "faces=$(python3 -c "import json;print(json.dumps([f['slug'] for f in json.load(open('garmin-faces/faces.json'))]))")" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: list
     runs-on: ubuntu-latest
     container: ghcr.io/matco/connectiq-tester:latest
     strategy:
       fail-fast: false
+      max-parallel: 20
       matrix:
-        face: [aurum, onyx-regent, meridian-blue, rose-sovereign, carbon-gt, emerald-court, platinum-reserve, midnight-celeste, deco-imperial, ivory-heritage]
+        face: ${{ fromJson(needs.list.outputs.faces) }}
     steps:
       - uses: actions/checkout@v4
       - name: Compile for every supported watch

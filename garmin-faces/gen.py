@@ -104,6 +104,15 @@ def render(f, hour=10, minute=9, sec=36, day=14, battery=82, steps=7421, hr=58, 
             seed = (seed * 73 + 41) % 997; sy = cy - r + seed * 2 * r / 997
             rr = 4 if s % 9 == 0 else 2
             d.ellipse([sx - rr, sy - rr, sx + rr, sy + rr], fill=col("metal") if s % 6 == 0 else col("pat"))
+    elif p == 6:
+        for g, (gx0, gy0, gr0) in enumerate([(-0.30, -0.28, 0.26), (0.34, -0.20, 0.20), (0.30, 0.30, 0.24), (-0.36, 0.26, 0.16), (0.0, 0.0, 0.14)]):
+            gx, gy, gr = cx + r * gx0, cy + r * gy0, r * gr0
+            for k in (1, 0.82, 0.28):
+                d.ellipse([gx - gr * k, gy - gr * k, gx + gr * k, gy + gr * k], outline=col("pat"), width=4)
+            for sp in range(6):
+                ga = math.pi * sp / 3 + g
+                d.line([(gx + gr * 0.28 * math.sin(ga), gy - gr * 0.28 * math.cos(ga)),
+                        (gx + gr * 0.82 * math.sin(ga), gy - gr * 0.82 * math.cos(ga))], fill=col("pat"), width=4)
     elif p == 5:
         gap = r / 8
         for v in range(-8, 9):
@@ -216,23 +225,30 @@ def render(f, hour=10, minute=9, sec=36, day=14, battery=82, steps=7421, hr=58, 
     return out
 
 
-def main():
+def sheet(faces, path, cols=5):
     size, pad, label = 416, 28, 70
-    cols = 5
-    sheet = Image.new("RGB", (cols * (size + pad) + pad, 2 * (size + pad + label) + pad), (14, 14, 16))
-    sd = ImageDraw.Draw(sheet)
-    for i, f in enumerate(FACES):
+    rows = (len(faces) + cols - 1) // cols
+    im = Image.new("RGB", (cols * (size + pad) + pad, rows * (size + pad + label) + pad), (14, 14, 16))
+    sd = ImageDraw.Draw(im)
+    for i, f in enumerate(faces):
+        small = Image.open(os.path.join(HERE, "design", f["slug"] + ".png"))
+        x = pad + (i % cols) * (size + pad)
+        y = pad + (i // cols) * (size + pad + label)
+        im.paste(small, (x, y), small)
+        name = f["name"] if f["name"].startswith("No.") else "No. %d %s" % (f["num"], f["name"])
+        sd.text((x + size / 2, y + size + 24), name, font=font(28, True), fill=(235, 225, 200), anchor="mm")
+        sd.text((x + size / 2, y + size + 54), f["tag"], font=font(14), fill=(150, 150, 150), anchor="mm")
+    im.save(path)
+
+
+def main():
+    for f in FACES:
         d = project(f)
         face = render(f)
         face.resize((80, 80), Image.LANCZOS).save(os.path.join(d, "resources", "launcher_icon.png"))
-        small = face.resize((size, size), Image.LANCZOS)
-        small.save(os.path.join(HERE, "design", f["slug"] + ".png"))
-        x = pad + (i % cols) * (size + pad)
-        y = pad + (i // cols) * (size + pad + label)
-        sheet.paste(small, (x, y), small)
-        sd.text((x + size / 2, y + size + 24), f["name"], font=font(28, True), fill=(235, 225, 200), anchor="mm")
-        sd.text((x + size / 2, y + size + 54), f["tag"], font=font(15), fill=(150, 150, 150), anchor="mm")
-    sheet.save(os.path.join(HERE, "design", "collection.png"))
+        face.resize((416, 416), Image.LANCZOS).save(os.path.join(HERE, "design", f["slug"] + ".png"))
+    sheet(FACES[:10], os.path.join(HERE, "design", "collection.png"))
+    sheet(FACES[10:], os.path.join(HERE, "design", "collection-2.png"))
     print("built", len(FACES), "faces")
 
 
