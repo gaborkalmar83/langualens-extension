@@ -20,6 +20,9 @@ module Style {
         :bottom => 1,
         :date => false,
         :digital => true,
-        :sweep => false
+        :sweep => false,
+        :layout => 0,
+        :v => 0,
+        :bezel => true
     };
 }

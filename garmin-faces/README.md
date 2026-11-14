@@ -19,20 +19,24 @@ Forty luxury Garmin watch faces. Each one is its own Connect IQ app, meant to be
 
 ## Faces 11 to 40
 
-Thirty more, numbered, in six styles of five.
+Thirty more, numbered. Ten different layouts, three takes on each, so no two neighbours look alike.
 
 ![Faces 11 to 40](design/collection-2.png)
 
-| Numbers | Style |
-| --- | --- |
-| 11 to 15 | Classic dress: roman numerals, engraved dial, small seconds |
-| 16 to 20 | Racing chronograph: carbon dial, heart rate, steps, small seconds |
-| 21 to 25 | Art deco digital: pinstripes, power reserve |
-| 26 to 30 | Celestial: star field, gem markers, moon phase |
-| 31 to 35 | Modern minimal: clean dial, date |
-| 36 to 40 | Skeleton: gears visible behind the hands |
+| Layout | Numbers | Idea |
+| --- | --- | --- |
+| Orrery | 11, 21, 31 | Planets orbit instead of hands |
+| Grand Numeral | 12, 22, 32 | Giant stacked numerals |
+| Regulator | 13, 23, 33 | Minutes in the centre, hours in their own dial |
+| Sector | 14, 24, 34 | Time as two glowing arcs |
+| Jump Hour | 15, 25, 35 | The hour in a window, minutes on a scale |
+| Lexicon | 16, 26, 36 | The time written out in words |
+| Pave | 17, 27, 37 | Gems light up with the hours |
+| Tape | 18, 28, 38 | Two scales slide under a pointer |
+| Retrograde | 19, 29, 39 | A fan-shaped minute hand that snaps back |
+| Bicolor | 20, 30, 40 | A two-tone dial, split in the middle |
 
-Folders are named by number, for example `11-sable-regent`.
+Folders are named by number, for example `11-orrery-gold`.
 
 ## What the faces show
 

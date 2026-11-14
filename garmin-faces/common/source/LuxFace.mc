@@ -56,7 +56,7 @@ class LuxFace extends WatchUi.WatchFace {
         if (_sleep && (set has :requiresBurnInProtection) && set.requiresBurnInProtection) {
             dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
             dc.clear();
-            if (c[:digital]) {
+            if (c[:digital] || c[:layout] != 0) {
                 dc.setColor(0x777777, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(cx, cy, Graphics.FONT_NUMBER_MILD, timeText(t, set), CV);
             } else {
@@ -68,6 +68,11 @@ class LuxFace extends WatchUi.WatchFace {
         dc.setColor(c[:txt], c[:bg]);
         dc.clear();
         pattern(dc);
+        if (c[:layout] != 0) {
+            if (c[:bezel]) { bezel(dc); }
+            art(dc, t, set);
+            return;
+        }
         bezel(dc);
         indices(dc);
         var top = c[:digital] ? 0.56 : 0.38;
@@ -367,5 +372,211 @@ class LuxFace extends WatchUi.WatchFace {
         dc.fillCircle(cx, cy, r * 0.05);
         dc.setColor(c[:bg], Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cy, r * 0.02);
+    }
+
+    // ================= art layouts (c[:layout] 1..10) =================
+    hidden function ring(dc, x, y, rad, f0, f1, pw, color) {
+        var a0 = (90 - 360 * f0).toNumber();
+        var a1 = (90 - 360 * f1).toNumber();
+        if (a0 == a1) { return; }
+        while (a0 < 0) { a0 += 360; }
+        while (a1 < 0) { a1 += 360; }
+        dc.setPenWidth(pw);
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawArc(x, y, rad, Graphics.ARC_CLOCKWISE, a0 % 360, a1 % 360);
+        dc.setPenWidth(1);
+    }
+
+    hidden function disc(dc, p, rad, color) {
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(p[0], p[1], rad);
+    }
+
+    hidden function art(dc, t, set) {
+        var L = c[:layout];
+        var v = c[:v];
+        var m = t.min;
+        var hh = t.hour;
+        if (!set.is24Hour) {
+            hh = hh % 12;
+            if (hh == 0) { hh = 12; }
+        }
+        var H = hh.format("%02d");
+        var M = m.format("%02d");
+        var hf = ((t.hour % 12) + m / 60.0) / 12;
+        var mf = m / 60.0;
+        var TAU = Math.PI * 2;
+        var d = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+        var date = d.day_of_week.toUpper() + " " + d.day;
+        var pw = (r * 0.09).toNumber();
+
+        if (L == 1) {           // orbit: planets instead of hands
+            dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+            dc.drawCircle(cx, cy, r * 0.82);
+            dc.drawCircle(cx, cy, r * 0.54);
+            if (v == 1) {
+                ring(dc, cx, cy, r * 0.82, 0, mf, 3, c[:accent]);
+                ring(dc, cx, cy, r * 0.54, 0, hf, 3, c[:metal]);
+            }
+            for (var i = 0; i < 12; i++) { disc(dc, pt(TAU * i / 12, r * 0.82, 0), r * 0.012, c[:metal2]); }
+            disc(dc, pt(TAU * hf, r * 0.54, 0), r * 0.11, c[:metal]);
+            if (v == 2) { disc(dc, pt(TAU * hf, r * 0.54, 0), r * 0.05, c[:bg]); }
+            disc(dc, pt(TAU * mf, r * 0.82, 0), r * 0.07, c[:accent]);
+            disc(dc, [cx, cy], r * 0.22, c[:sub]);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.drawCircle(cx, cy, r * 0.22);
+            text(dc, cx, cy, Graphics.FONT_SMALL, d.day.toString(), c[:txt]);
+        } else if (L == 2) {    // grand numerals: stacked giant digits
+            text(dc, cx, cy - r * 0.40, Graphics.FONT_NUMBER_THAI_HOT, H, c[:metal]);
+            text(dc, cx, cy + r * 0.40, Graphics.FONT_NUMBER_THAI_HOT, M, c[:txt]);
+            dc.setColor(c[:accent], Graphics.COLOR_TRANSPARENT);
+            dc.fillRectangle(cx - r * 0.7, cy - 1, r * 0.4, 3);
+            dc.fillRectangle(cx + r * 0.3, cy - 1, r * 0.4, 3);
+            text(dc, cx, cy, Graphics.FONT_XTINY, (v == 0) ? date : c[:mark], c[:accent]);
+        } else if (L == 3) {    // regulator: minutes centre, hours in their own dial
+            var hx = cx;
+            var hy = cy - r * 0.42;
+            var rs = r * 0.30;
+            disc(dc, [hx, hy], rs, c[:sub]);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.drawCircle(hx, hy, rs);
+            for (var k = 0; k < 12; k++) {
+                var a = TAU * k / 12;
+                dc.drawLine(hx + rs * 0.80 * Math.sin(a), hy - rs * 0.80 * Math.cos(a), hx + rs * 0.95 * Math.sin(a), hy - rs * 0.95 * Math.cos(a));
+            }
+            var ha = TAU * hf;
+            dc.setPenWidth(3);
+            dc.drawLine(hx, hy, hx + rs * 0.62 * Math.sin(ha), hy - rs * 0.62 * Math.cos(ha));
+            dc.setPenWidth(1);
+            sub(dc, (v == 1) ? 2 : ((v == 2) ? 1 : 5), cx, cy + r * 0.46);
+            bar(dc, TAU * mf, -r * 0.12, r * 0.84, r * 0.018, c[:hand]);
+            disc(dc, [cx, cy], r * 0.045, c[:hand]);
+            text(dc, cx + r * 0.50, cy, Graphics.FONT_XTINY, date, c[:txt]);
+        } else if (L == 4) {    // sectors: time as two glowing arcs
+            ring(dc, cx, cy, r * 0.88, 0, 0.999, pw, c[:metal2]);
+            ring(dc, cx, cy, r * 0.88, 0, mf, pw, c[:accent]);
+            ring(dc, cx, cy, r * 0.70, 0, 0.999, pw, c[:sub]);
+            ring(dc, cx, cy, r * 0.70, 0, hf, pw, c[:metal]);
+            text(dc, cx, cy - r * 0.05, Graphics.FONT_NUMBER_MEDIUM, H + ":" + M, c[:txt]);
+            text(dc, cx, cy + r * 0.30, Graphics.FONT_XTINY, date, c[:metal]);
+        } else if (L == 5) {    // jump hour: hour in a window, minutes on a scale
+            var ww = r * 0.74;
+            var wh = r * 0.50;
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(cx - ww / 2, cy - r * 0.62, ww, wh, r * 0.06);
+            dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+            dc.setPenWidth(2);
+            dc.drawRoundedRectangle(cx - ww / 2, cy - r * 0.62, ww, wh, r * 0.06);
+            dc.setPenWidth(1);
+            text(dc, cx, cy - r * 0.37, Graphics.FONT_NUMBER_HOT, H, c[:txt]);
+            ring(dc, cx, cy, r * 0.80, 0.33, 0.67, 2, c[:metal2]);
+            for (var q = 0; q <= 12; q++) {
+                var fa = TAU * (0.67 - 0.34 * q / 12);
+                var p0 = pt(fa, r * 0.76, 0);
+                var p1 = pt(fa, r * 0.84, 0);
+                dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(p0[0], p0[1], p1[0], p1[1]);
+            }
+            disc(dc, pt(TAU * (0.67 - 0.34 * mf), r * 0.80, 0), r * 0.06, c[:accent]);
+            text(dc, cx, cy + r * 0.22, Graphics.FONT_MEDIUM, M, c[:metal]);
+            text(dc, cx, cy + r * 0.50, Graphics.FONT_XTINY, (v == 0) ? "MINUTES" : date, c[:metal2]);
+        } else if (L == 6) {    // words
+            var hw = ["TWELVE", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN"];
+            var ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE",
+                        "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"];
+            var tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY"];
+            var mw = "O'CLOCK";
+            if (m > 0 && m < 10) { mw = "OH " + ones[m]; }
+            if (m >= 10 && m < 20) { mw = ones[m]; }
+            if (m >= 20) { mw = tens[m / 10] + ((m % 10 > 0) ? " " + ones[m % 10] : ""); }
+            dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(cx - r * 0.6, cy - r * 0.42, cx + r * 0.6, cy - r * 0.42);
+            dc.drawLine(cx - r * 0.6, cy + r * 0.36, cx + r * 0.6, cy + r * 0.36);
+            text(dc, cx, cy - r * 0.56, Graphics.FONT_XTINY, (v == 2) ? c[:mark] : "IT IS", c[:metal2]);
+            text(dc, cx, cy - r * 0.18, Graphics.FONT_LARGE, hw[t.hour % 12], c[:metal]);
+            text(dc, cx, cy + r * 0.14, Graphics.FONT_SMALL, mw, c[:txt]);
+            text(dc, cx, cy + r * 0.52, Graphics.FONT_XTINY, date, c[:accent]);
+        } else if (L == 7) {    // pave: gems light up with the hours, dots with the minutes
+            for (var j = 0; j < 60; j++) {
+                disc(dc, pt(TAU * j / 60, r * 0.90, 0), (j <= m) ? r * 0.024 : r * 0.012, (j <= m) ? c[:accent] : c[:metal2]);
+            }
+            var lit = t.hour % 12;
+            if (lit == 0) { lit = 12; }
+            for (var g = 1; g <= 12; g++) {
+                var gp = pt(TAU * g / 12, r * 0.66, 0);
+                if (g <= lit) {
+                    disc(dc, gp, r * 0.075, c[:metal]);
+                    disc(dc, gp, r * 0.03, c[:txt]);
+                } else {
+                    dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+                    dc.drawCircle(gp[0], gp[1], r * 0.06);
+                }
+            }
+            text(dc, cx, cy - r * 0.05, Graphics.FONT_NUMBER_MILD, H + ":" + M, c[:txt]);
+            text(dc, cx, cy + r * 0.24, Graphics.FONT_XTINY, date, c[:metal]);
+        } else if (L == 8) {    // tape: two scales slide under a fixed pointer
+            var bh = r * 0.34;
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            dc.fillRectangle(0, cy - r * 0.44, r * 2 + 2, bh);
+            dc.fillRectangle(0, cy + r * 0.10, r * 2 + 2, bh);
+            var hpos = (t.hour % 12) + m / 60.0;
+            for (var n = -3; n <= 15; n++) {
+                var x = cx + (n - hpos) * r * 0.55;
+                if (x > cx - r * 1.1 && x < cx + r * 1.1) {
+                    var lab = n % 12;
+                    if (lab <= 0) { lab += 12; }
+                    text(dc, x, cy - r * 0.27, Graphics.FONT_MEDIUM, lab.toString(), c[:metal]);
+                }
+            }
+            for (var w = m - 12; w <= m + 12; w++) {
+                var mx = cx + (w - m) * r * 0.09;
+                var big = (w % 5 == 0);
+                dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(mx, cy + r * 0.10, mx, cy + r * (big ? 0.19 : 0.15));
+                if (big && w != m) { text(dc, mx, cy + r * 0.31, Graphics.FONT_XTINY, ((w + 60) % 60).format("%02d"), c[:txt]); }
+            }
+            dc.setColor(c[:accent], Graphics.COLOR_TRANSPARENT);
+            dc.fillRectangle(cx - 1, cy - r * 0.50, 3, r * 1.0);
+            dc.fillPolygon([[cx - r * 0.06, cy - r * 0.56], [cx + r * 0.06, cy - r * 0.56], [cx, cy - r * 0.46]]);
+            text(dc, cx, cy - r * 0.70, Graphics.FONT_XTINY, c[:mark], c[:metal2]);
+            text(dc, cx, cy + r * 0.64, Graphics.FONT_XTINY, date, c[:metal]);
+        } else if (L == 9) {    // retrograde: minute hand sweeps a fan and snaps back
+            var py = cy + r * 0.30;
+            dc.setPenWidth(2);
+            dc.setColor(c[:metal2], Graphics.COLOR_TRANSPARENT);
+            dc.drawArc(cx, py, r * 1.05, Graphics.ARC_CLOCKWISE, 150, 30);
+            dc.setPenWidth(1);
+            for (var e = 0; e <= 12; e++) {
+                var ea = (-60 + 10 * e) * Math.PI / 180;
+                var len = (e % 3 == 0) ? 0.10 : 0.05;
+                dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                dc.drawLine(cx + r * (1.05 - len) * Math.sin(ea), py - r * (1.05 - len) * Math.cos(ea), cx + r * 1.05 * Math.sin(ea), py - r * 1.05 * Math.cos(ea));
+            }
+            var ra = (-60 + 120 * mf) * Math.PI / 180;
+            dc.setPenWidth(3);
+            dc.setColor(c[:accent], Graphics.COLOR_TRANSPARENT);
+            dc.drawLine(cx, py, cx + r * 0.98 * Math.sin(ra), py - r * 0.98 * Math.cos(ra));
+            dc.setPenWidth(1);
+            disc(dc, [cx, py], r * 0.07, c[:metal]);
+            text(dc, cx, cy + r * 0.62, Graphics.FONT_NUMBER_MILD, H, c[:txt]);
+            text(dc, cx - r * 0.52, cy + r * 0.45, Graphics.FONT_XTINY, "0", c[:metal2]);
+            text(dc, cx + r * 0.52, cy + r * 0.45, Graphics.FONT_XTINY, "60", c[:metal2]);
+        } else {                // split: two-tone dial, hour left, minute right
+            dc.setColor(c[:sub], Graphics.COLOR_TRANSPARENT);
+            if (v == 1) {
+                dc.fillRectangle(0, 0, r * 2 + 2, cy);
+                text(dc, cx, cy - r * 0.42, Graphics.FONT_NUMBER_HOT, H, c[:txt]);
+                text(dc, cx, cy + r * 0.42, Graphics.FONT_NUMBER_HOT, M, c[:metal]);
+                dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(0, cy - 1, r * 2 + 2, 3);
+            } else {
+                dc.fillRectangle(0, 0, cx, r * 2 + 2);
+                text(dc, cx - r * 0.44, cy, Graphics.FONT_NUMBER_HOT, H, c[:txt]);
+                text(dc, cx + r * 0.44, cy, Graphics.FONT_NUMBER_HOT, M, c[:metal]);
+                dc.setColor(c[:metal], Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(cx - 1, 0, 3, r * 2 + 2);
+                text(dc, cx + r * 0.44, cy + r * 0.52, Graphics.FONT_XTINY, date, c[:accent]);
+            }
+        }
     }
 }
