@@ -1,0 +1,25 @@
+<resources>
+    <properties>
+        <property id="motivation" type="boolean">false</property>
+        <property id="coachFreq" type="number">1</property>
+        <property id="theme" type="number">0</property>
+        <property id="sport" type="number">0</property>
+        <property id="goal" type="number">3</property>
+        <property id="vibe" type="boolean">true</property>
+        <property id="tones" type="boolean">true</property>
+        <property id="gestures" type="boolean">true</property>
+        <property id="gShake" type="number">4</property>
+        <property id="gTwist" type="number">1</property>
+        <property id="gFlip" type="number">3</property>
+        <property id="gSens" type="number">1</property>
+        <property id="hrTarget" type="number">0</property>
+        <property id="cadTarget" type="number">0</property>
+        <property id="climbStep" type="number">2</property>
+        <property id="useGps" type="boolean">true</property>
+        <property id="autoLap" type="boolean">true</property>
+        <property id="spo2Warn" type="boolean">true</property>
+        <property id="heatWarn" type="boolean">true</property>
+        <property id="compass" type="boolean">false</property>
+        <property id="bodyAdapt" type="boolean">true</property>
+    </properties>
+</resources>

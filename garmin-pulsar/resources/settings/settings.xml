@@ -1,0 +1,129 @@
+<resources>
+    <settings>
+        <setting propertyKey="@Properties.motivation" title="@Strings.sMotivation"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.coachFreq" title="@Strings.sCoachFreq">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.c0</listEntry>
+                <listEntry value="1">@Strings.c1</listEntry>
+                <listEntry value="2">@Strings.c2</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.theme" title="@Strings.sTheme">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.t0</listEntry>
+                <listEntry value="1">@Strings.t1</listEntry>
+                <listEntry value="2">@Strings.t2</listEntry>
+                <listEntry value="3">@Strings.t3</listEntry>
+                <listEntry value="4">@Strings.t4</listEntry>
+                <listEntry value="5">@Strings.t5</listEntry>
+                <listEntry value="6">@Strings.t6</listEntry>
+                <listEntry value="7">@Strings.t7</listEntry>
+                <listEntry value="8">@Strings.t8</listEntry>
+                <listEntry value="9">@Strings.t9</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.sport" title="@Strings.sSport">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.sp0</listEntry>
+                <listEntry value="1">@Strings.sp1</listEntry>
+                <listEntry value="2">@Strings.sp2</listEntry>
+                <listEntry value="3">@Strings.sp3</listEntry>
+                <listEntry value="4">@Strings.sp4</listEntry>
+                <listEntry value="5">@Strings.sp5</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.goal" title="@Strings.sGoal">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.g0</listEntry>
+                <listEntry value="1">@Strings.g1</listEntry>
+                <listEntry value="2">@Strings.g2</listEntry>
+                <listEntry value="3">@Strings.g3</listEntry>
+                <listEntry value="4">@Strings.g4</listEntry>
+                <listEntry value="5">@Strings.g5</listEntry>
+                <listEntry value="6">@Strings.g6</listEntry>
+                <listEntry value="7">@Strings.g7</listEntry>
+                <listEntry value="8">@Strings.g8</listEntry>
+                <listEntry value="9">@Strings.g9</listEntry>
+                <listEntry value="10">@Strings.g10</listEntry>
+                <listEntry value="11">@Strings.g11</listEntry>
+                <listEntry value="12">@Strings.g12</listEntry>
+                <listEntry value="13">@Strings.g13</listEntry>
+                <listEntry value="14">@Strings.g14</listEntry>
+                <listEntry value="15">@Strings.g15</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.vibe" title="@Strings.sVibe"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.tones" title="@Strings.sTones"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.gestures" title="@Strings.sGestures"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.gShake" title="@Strings.sShake">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.a0</listEntry>
+                <listEntry value="1">@Strings.a1</listEntry>
+                <listEntry value="2">@Strings.a2</listEntry>
+                <listEntry value="3">@Strings.a3</listEntry>
+                <listEntry value="4">@Strings.a4</listEntry>
+                <listEntry value="5">@Strings.a5</listEntry>
+                <listEntry value="6">@Strings.a6</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.gTwist" title="@Strings.sTwist">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.a0</listEntry>
+                <listEntry value="1">@Strings.a1</listEntry>
+                <listEntry value="2">@Strings.a2</listEntry>
+                <listEntry value="3">@Strings.a3</listEntry>
+                <listEntry value="4">@Strings.a4</listEntry>
+                <listEntry value="5">@Strings.a5</listEntry>
+                <listEntry value="6">@Strings.a6</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.gFlip" title="@Strings.sFlip">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.a0</listEntry>
+                <listEntry value="1">@Strings.a1</listEntry>
+                <listEntry value="2">@Strings.a2</listEntry>
+                <listEntry value="3">@Strings.a3</listEntry>
+                <listEntry value="4">@Strings.a4</listEntry>
+                <listEntry value="5">@Strings.a5</listEntry>
+                <listEntry value="6">@Strings.a6</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.gSens" title="@Strings.sSens">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.l0</listEntry>
+                <listEntry value="1">@Strings.l1</listEntry>
+                <listEntry value="2">@Strings.l2</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.hrTarget" title="@Strings.sHr">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.off</listEntry>
+                <listEntry value="1">@Strings.z2</listEntry>
+                <listEntry value="2">@Strings.z3</listEntry>
+                <listEntry value="3">@Strings.z4</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.cadTarget" title="@Strings.sCad">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.off</listEntry>
+                <listEntry value="1">@Strings.cad1</listEntry>
+                <listEntry value="2">@Strings.cad2</listEntry>
+                <listEntry value="3">@Strings.cad3</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.climbStep" title="@Strings.sClimb">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.off</listEntry>
+                <listEntry value="1">@Strings.cl1</listEntry>
+                <listEntry value="2">@Strings.cl2</listEntry>
+                <listEntry value="3">@Strings.cl3</listEntry>
+            </settingConfig>
+        </setting>
+        <setting propertyKey="@Properties.useGps" title="@Strings.sGps"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.autoLap" title="@Strings.sLap"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.spo2Warn" title="@Strings.sSpo2"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.heatWarn" title="@Strings.sHeat"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.compass" title="@Strings.sCompass"><settingConfig type="boolean"/></setting>
+        <setting propertyKey="@Properties.bodyAdapt" title="@Strings.sBody"><settingConfig type="boolean"/></setting>
+    </settings>
+</resources>

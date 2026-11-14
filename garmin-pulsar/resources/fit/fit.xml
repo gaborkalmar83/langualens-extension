@@ -1,0 +1,5 @@
+<resources>
+    <fitContributions>
+        <fitField id="0" displayInChart="true" sortOrder="0" precision="0" chartTitle="@Strings.fScore" dataLabel="@Strings.fScore" unitLabel="@Strings.fUnit" fillColor="#00E5FF"/>
+    </fitContributions>
+</resources>
