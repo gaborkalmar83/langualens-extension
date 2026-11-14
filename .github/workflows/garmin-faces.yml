@@ -1,0 +1,45 @@
+name: Garmin watch faces build
+
+on:
+  push:
+    paths:
+      - "garmin-faces/**"
+      - ".github/workflows/garmin-faces.yml"
+  pull_request:
+    paths:
+      - "garmin-faces/**"
+      - ".github/workflows/garmin-faces.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/matco/connectiq-tester:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        face: [aurum, onyx-regent, meridian-blue, rose-sovereign, carbon-gt, emerald-court, platinum-reserve, midnight-celeste, deco-imperial, ivory-heritage]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile for every supported watch
+        shell: bash
+        run: |
+          set -eo pipefail
+          # the SDK looks for device files under /root
+          export HOME=/root
+          cd "garmin-faces/${{ matrix.face }}"
+          # throwaway developer key, only for this build
+          openssl genrsa -out /tmp/key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/key.pem -out /tmp/key.der -nocrypt
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          for d in $(grep -o 'product id="[^"]*"' manifest.xml | cut -d'"' -f2); do
+            echo "::group::$d"
+            monkeyc -f monkey.jungle -d "$d" -o "$GITHUB_WORKSPACE/out/${{ matrix.face }}-$d.prg" -y /tmp/key.der -w
+            echo "::endgroup::"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: face-${{ matrix.face }}
+          path: out/*.prg
