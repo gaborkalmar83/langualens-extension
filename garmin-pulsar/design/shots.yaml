@@ -1,0 +1,21 @@
+# Concept art for the ten Pulsar designs.
+# Run: python3 <azure-image-gen>/scripts/azimg.py batch design/shots.yaml
+style: >
+  Product concept render of a round sports smartwatch face shown straight on,
+  filling the frame, on a pure black background. Futuristic HUD interface:
+  two thin circular progress rings around the edge, a large digital timer
+  readout area in the centre, small data blocks below. Glowing, crisp,
+  high contrast, minimal. No brand marks, no hands, no people.
+out_dir: concepts
+defaults: {size: 1024x1024, quality: medium}
+shots:
+  - {id: 01-neon-grid, prompt: "Cyan and magenta neon. Segmented rings made of short dashes. A faint perspective grid in the lower third."}
+  - {id: 02-plasma, prompt: "Deep violet and hot pink plasma glow. Smooth solid rings with soft bloom."}
+  - {id: 03-reactor, prompt: "Bright green and lime reactor core look. Rings made of small dots."}
+  - {id: 04-solar-flare, prompt: "Orange and gold solar flare. Thick solid rings, warm glow on dark amber black."}
+  - {id: 05-ice-core, prompt: "Pale ice blue and white. Very thin twin line rings, cold and clean."}
+  - {id: 06-crimson-ops, prompt: "Red and steel grey tactical look. Segmented rings, sharp and serious."}
+  - {id: 07-deep-space, prompt: "Indigo and teal with a few small stars in the background. Dotted rings."}
+  - {id: 08-hologram, prompt: "Aqua and violet hologram. Thin twin line rings with light transparency."}
+  - {id: 09-stealth, prompt: "Matte grey monochrome with one amber accent. Rings made of twelve large blocks, corner brackets around the centre."}
+  - {id: 10-aurora, prompt: "Green, blue and violet aurora colours. Rings made of twelve large blocks, soft gradient glow."}
