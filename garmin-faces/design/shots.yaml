@@ -1,0 +1,20 @@
+# Marketing art for the Maison collection (Azure image generation).
+# Run: python3 <azure-image-gen>/scripts/azimg.py batch design/shots.yaml
+style: >
+  Luxury watch advertising photograph. A round smartwatch seen straight on,
+  filling most of the frame, resting on a rich surface with soft studio light
+  and gentle reflections. Elegant analogue dial, fine detail, shallow depth
+  of field, premium magazine look. No brand marks, no people.
+out_dir: concepts
+defaults: {size: 1024x1024, quality: high}
+shots:
+  - {id: aurum, prompt: "Black sunburst dial, yellow gold case and hands, gold baton markers, small power reserve gauge at six. Black marble surface."}
+  - {id: onyx-regent, prompt: "Deep black dial with fine concentric engraving, polished steel case, roman numeral markers, small seconds dial at six. Dark slate surface."}
+  - {id: meridian-blue, prompt: "Navy blue sunburst dial, steel case, white sword hands, orange seconds hand, moon phase window at six. Teak yacht deck."}
+  - {id: rose-sovereign, prompt: "Cocoa brown dial, rose gold case, small diamond hour markers, moon phase at six. Cream silk fabric."}
+  - {id: carbon-gt, prompt: "Carbon fibre weave dial, steel case, red accents, three small sub-dials like a racing chronograph. Black leather car seat with red stitching."}
+  - {id: emerald-court, prompt: "Deep racing green sunburst dial, yellow gold case, gold roman numerals. Green velvet surface."}
+  - {id: platinum-reserve, prompt: "Silver white engraved dial, platinum case, slim blued steel hands, small power reserve gauge. White marble surface."}
+  - {id: midnight-celeste, prompt: "Midnight blue dial scattered with tiny stars, gold case, gem hour markers, golden moon phase at six. Dark blue velvet."}
+  - {id: deco-imperial, prompt: "Black dial with fine gold vertical pinstripes in art deco style, gold case, large gold digital time area in the centre left blank. Black lacquer surface."}
+  - {id: ivory-heritage, prompt: "Cream enamel dial, black roman numerals, blued steel hands, small seconds dial at six, dark steel case. Walnut wood desk."}

@@ -1,0 +1,42 @@
+name: Garmin Pulsar build
+
+on:
+  push:
+    paths:
+      - "garmin-pulsar/**"
+      - ".github/workflows/garmin-pulsar.yml"
+  pull_request:
+    paths:
+      - "garmin-pulsar/**"
+      - ".github/workflows/garmin-pulsar.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/matco/connectiq-tester:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile for every supported watch
+        shell: bash
+        run: |
+          set -eo pipefail
+          # the SDK looks for device files under /root
+          export HOME=/root
+          cd garmin-pulsar
+          # throwaway developer key, only for this build
+          openssl genrsa -out /tmp/key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/key.pem -out /tmp/key.der -nocrypt
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          for d in $(grep -o 'product id="[^"]*"' manifest.xml | cut -d'"' -f2); do
+            echo "::group::$d"
+            monkeyc -f monkey.jungle -d "$d" -o "$GITHUB_WORKSPACE/out/pulsar-$d.prg" -y /tmp/key.der -w
+            echo "::endgroup::"
+          done
+          rm -f "$GITHUB_WORKSPACE"/out/*.debug.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pulsar-prg
+          path: out/*.prg
